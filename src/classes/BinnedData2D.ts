@@ -1,4 +1,4 @@
-export default class BinnedData {
+export default class BinnedData2D {
 	data: number[][];
     numberOfBins: number;
 	constructor(data: number[][]) {
@@ -13,11 +13,11 @@ export default class BinnedData {
      * @param yRange 
      * @returns 
      */
-	convertToUnbinnedData(xRange: number, yRange: number) {
+	getUnbinnedData(xRange: number, yRange: number) {
 		let n = this.numberOfBins;
 		let unbinnedData = [];
 		for (let i = 0; i < n; i++) {
-			for (let j = i; j < n; j++) {
+			for (let j = 0; j < n; j++) {
 				let numberOfPoints = this.data[i][j];
 				let x1 = (i * xRange) / n;
 				let y1 = (j * yRange) / n;
@@ -38,5 +38,16 @@ export default class BinnedData {
 
 	getNumberOfBins() {
 		return this.data.length;
+	}
+
+	transposeData() {
+		let newData : number[][] = [];
+		for (let i = 0; i < this.data.length; i++) {
+			newData.push([]);
+			for (let j = 0; j < this.data.length; j++) {
+				newData[i].push(this.data[j][i]);
+			}
+		}
+		this.data = newData;
 	}
 }

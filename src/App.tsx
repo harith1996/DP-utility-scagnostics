@@ -1,35 +1,52 @@
 import React, { useEffect } from "react";
-import logo from "./logo.svg";
 import "./App.css";
 import Scagnostics from "./lib/scagnostics.js";
 import FileUploadSingle from "./components/FileUploadSingle";
 import { parse } from "papaparse";
-import BinnedData from "./classes/BinnedData";
+import BinnedData2D from "./classes/BinnedData2D";
+import Data2D from "./classes/Data2D";
 
 /* eslint-disable-next-line no-restricted-globals */
 function App() {
-	const [originalData, setOriginalData] = React.useState<any>(null);
-	const [privBinnedData, setPrivBinnedData] = React.useState<any>(null);
+	const [originalData, setOriginalData] = React.useState<Data2D | undefined>(undefined);
+	const [privBinnedData2D, setPrivBinnedData2D] = React.useState<BinnedData2D | undefined>(undefined);
+	const [privUnbinnedData2D, setPrivUnbinnedData] = React.useState<Data2D | undefined>(undefined);
+	const [scagnostics, setScagnostics] = React.useState<Scagnostics>([]);
+	const extractDataValues = (data: any) => {
+		return data.map((d: any) =>
+			Object.values(d).map((v: any) => parseFloat(v))
+		);
+	};
 	const handleOriginalData = (data: File | undefined) => {
 		data!.text().then((data) => {
 			let parsedData = parse(data, { header: true }).data;
-			let dataValues = parsedData.map((d: any) => Object.values(d).map((v: any) => parseFloat(v))).slice(0, -1);
-			setOriginalData(dataValues);
+			let dataValues = extractDataValues(parsedData).slice(0, -1);
+			setOriginalData(new Data2D(dataValues));
 		});
 	};
 	const handlePrivBinnedData = (data: File | undefined) => {
 		data!.text().then((data) => {
-			setPrivBinnedData(parse(data, { header: false }).data);
+			let parsedData = parse(data, { header: false }).data;
+			let dataValues = extractDataValues(parsedData).slice(0, -1);
+			setPrivBinnedData2D(new BinnedData2D(dataValues));
 		});
 	};
-  useEffect(() => {
-    if (originalData && privBinnedData) {
-      console.log(originalData);
-      console.log(new Scagnostics(originalData));
-      const binned = new BinnedData(privBinnedData);
-      console.log(binned);
-    }
-  }, [originalData, privBinnedData]);
+	useEffect(() => {
+		if (originalData && privBinnedData2D) {
+			setScagnostics(new Scagnostics(originalData.getData()));
+			privBinnedData2D.transposeData();
+		}
+	}, [originalData, privBinnedData2D]);
+	useEffect(() => {
+		if (scagnostics && originalData) {
+			console.log(scagnostics);
+			console.log(originalData!.binData(32,32));
+			console.log(privBinnedData2D);
+			let xRange = originalData.getRanges().xMax - originalData.getRanges().xMin;
+			let yRange = originalData.getRanges().yMax - originalData.getRanges().yMin;
+			console.log(privBinnedData2D?.getUnbinnedData(xRange, yRange));
+		}
+	}, [scagnostics]);
 	return (
 		<div className="App">
 			<div>
