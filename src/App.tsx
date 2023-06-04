@@ -42,9 +42,7 @@ function App() {
 			console.log(scagnostics);
 			console.log(originalData!.binData(32,32));
 			console.log(privBinnedData2D);
-			let xRange = originalData.getRanges().xMax - originalData.getRanges().xMin;
-			let yRange = originalData.getRanges().yMax - originalData.getRanges().yMin;
-			console.log(privBinnedData2D?.getUnbinnedData(xRange, yRange));
+			console.log(privBinnedData2D?.getUnbinnedData(originalData.xRange, originalData.yRange));
 		}
 	}, [scagnostics]);
 	return (

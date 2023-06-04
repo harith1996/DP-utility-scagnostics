@@ -4,7 +4,6 @@ export default class BinnedData2D {
 	constructor(data: number[][]) {
 		this.data = data;
         this.numberOfBins = data.length;
-		console.log("BinnedData");
 	}
 
     /**
