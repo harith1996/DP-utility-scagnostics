@@ -1,9 +1,21 @@
 //export a class for two dimensional data
 export default class Data2D {
     data: number[][];
+    xMin: number;
+    xMax: number;
+    yMin: number;
+    yMax: number;
+    xRange: number;
+    yRange: number;
     constructor(data: number[][]) {
         this.data = data;
-        console.log("Data2D");
+        let ranges = this.getRanges();
+        this.xMin = ranges.xMin;
+        this.xMax = ranges.xMax;
+        this.yMin = ranges.yMin;
+        this.yMax = ranges.yMax;
+        this.xRange = this.xMax - this.xMin;
+        this.yRange = this.yMax - this.yMin;
     }
 
     getData() {
