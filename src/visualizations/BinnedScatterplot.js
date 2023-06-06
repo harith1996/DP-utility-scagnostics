@@ -5,7 +5,7 @@ export default function BinnedScatterplot(
 		svgNodeSelector,
 		x = ([x]) => x, // given d in data, returns the (quantitative) x-value
 		y = ([, y]) => y, // given d in data, returns the (quantitative) y-value
-		r = 7, // (fixed) radius of dots, in pixels
+		r = 11, // (fixed) radius of dots, in pixels
 		title, // given d in data, returns the title
 		marginTop = 20, // top margin, in pixels
 		marginRight = 30, // right margin, in pixels
@@ -38,7 +38,7 @@ export default function BinnedScatterplot(
 	} = {}
 ) {
 	// Construct scales and axes.
-	const colorScale = d3.scaleSequential(d3.interpolateBlues).domain([0, 30]);
+	const colorScale = d3.scaleSequential(d3.interpolateBlues).domain([0, 20]);
 	const xScale = xType(xDomain, xRange);
 	const yScale = yType(yDomain, yRange);
 	const xAxis = d3.axisBottom(xScale).ticks(width / 80, xFormat);
@@ -106,7 +106,9 @@ export default function BinnedScatterplot(
 		.attr("height", r)
 		.style("fill", (d) => colorScale(d));
 
-	plot.attr("transform", `translate(0,${height - marginBottom})`)
-		.attr("transform", `translate(${marginLeft},0)`)
-		.attr("transform", `rotate(-90, ${width / 2}, ${height / 2})`);
+	plot.attr(
+		"transform",
+		`rotate(-90, ${width / 2}, ${height / 2}) translate(${20},0)`
+	);
+	return {colorScale : colorScale};
 }
