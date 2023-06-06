@@ -1,9 +1,13 @@
 // Copyright 2021 Observable, Inc.
 // Released under the ISC license.
 // https://observablehq.com/@d3/scatterplot
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import * as d3 from "d3";
 export default function Scatterplot(
 	data,
 	{
+		svgNodeSelector,
 		x = ([x]) => x, // given d in data, returns the (quantitative) x-value
 		y = ([, y]) => y, // given d in data, returns the (quantitative) y-value
 		r = 3, // (fixed) radius of dots, in pixels
@@ -52,12 +56,16 @@ export default function Scatterplot(
 	const xAxis = d3.axisBottom(xScale).ticks(width / 80, xFormat);
 	const yAxis = d3.axisLeft(yScale).ticks(height / 50, yFormat);
 
+	
 	const svg = d3
-		.create("svg")
+		.select(svgNodeSelector)
 		.attr("width", width)
 		.attr("height", height)
 		.attr("viewBox", [0, 0, width, height])
 		.attr("style", "max-width: 100%; height: auto; height: intrinsic;");
+
+		
+	svg.selectAll("*").remove();
 
 	svg.append("g")
 		.attr("transform", `translate(0,${height - marginBottom})`)
@@ -130,6 +138,4 @@ export default function Scatterplot(
 		.attr("cx", (i) => xScale(X[i]))
 		.attr("cy", (i) => yScale(Y[i]))
 		.attr("r", r);
-
-	return svg.node();
 }
