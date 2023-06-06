@@ -8,9 +8,15 @@ import Data2D from "./classes/Data2D";
 
 /* eslint-disable-next-line no-restricted-globals */
 function App() {
-	const [originalData, setOriginalData] = React.useState<Data2D | undefined>(undefined);
-	const [privBinnedData2D, setPrivBinnedData2D] = React.useState<BinnedData2D | undefined>(undefined);
-	const [privUnbinnedData2D, setPrivUnbinnedData] = React.useState<Data2D | undefined>(undefined);
+	const [originalData, setOriginalData] = React.useState<Data2D | undefined>(
+		undefined
+	);
+	const [privBinnedData2D, setPrivBinnedData2D] = React.useState<
+		BinnedData2D | undefined
+	>(undefined);
+	const [privUnbinnedData2D, setPrivUnbinnedData] = React.useState<
+		Data2D | undefined
+	>(undefined);
 	const [scagnostics, setScagnostics] = React.useState<Scagnostics>([]);
 	const extractDataValues = (data: any) => {
 		return data.map((d: any) =>
@@ -40,26 +46,33 @@ function App() {
 	useEffect(() => {
 		if (scagnostics && originalData) {
 			console.log(scagnostics);
-			console.log(originalData!.binData(32,32));
+			console.log(originalData!.binData(32, 32));
 			console.log(privBinnedData2D);
-			console.log(privBinnedData2D?.getUnbinnedData(originalData.xRange, originalData.yRange));
+			console.log(
+				privBinnedData2D?.getUnbinnedData(
+					originalData.xRange,
+					originalData.yRange
+				)
+			);
 		}
 	}, [scagnostics]);
 	return (
 		<div className="App">
-			<div>
-				Upload Original Unbinned Data (.csv)
-				<FileUploadSingle
-					fileExtension=".csv"
-					onUpload={handleOriginalData}
-				></FileUploadSingle>
-			</div>
-			<div>
-				Upload Private Binned Data (.csv)
-				<FileUploadSingle
-					fileExtension=".csv"
-					onUpload={handlePrivBinnedData}
-				></FileUploadSingle>
+			<div className="loader">
+				<div>
+					Upload Original Unbinned Data (.csv)
+					<FileUploadSingle
+						fileExtension=".csv"
+						onUpload={handleOriginalData}
+					></FileUploadSingle>
+				</div>
+				<div>
+					Upload Private Binned Data (.csv)
+					<FileUploadSingle
+						fileExtension=".csv"
+						onUpload={handlePrivBinnedData}
+					></FileUploadSingle>
+				</div>
 			</div>
 		</div>
 	);
