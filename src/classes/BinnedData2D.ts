@@ -1,3 +1,4 @@
+import Data2D from "./Data2D";
 export default class BinnedData2D {
 	data: number[][];
     numberOfBins: number;
@@ -25,14 +26,11 @@ export default class BinnedData2D {
 				for (let k = 0; k < numberOfPoints; k++) {
 					let x = Math.random() * (x2 - x1) + x1;
 					let y = Math.random() * (y2 - y1) + y1;
-					unbinnedData.push({
-						x: x,
-						y: y,
-					});
+					unbinnedData.push([x, y]);
 				}
 			}
 		}
-        return unbinnedData;
+        return new Data2D(unbinnedData);
 	}
 
 	getNumberOfBins() {
