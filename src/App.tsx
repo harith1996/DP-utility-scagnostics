@@ -5,8 +5,9 @@ import FileUploadSingle from "./components/FileUploadSingle";
 import { parse } from "papaparse";
 import BinnedData2D from "./classes/BinnedData2D";
 import Data2D from "./classes/Data2D";
-import Scatterplot from "./classes/Scatterplot";
-import BinnedScatterplot from "./classes/BinnedScatterplot";
+import Scatterplot from "./visualizations/Scatterplot";
+import BinnedScatterplot from "./visualizations/BinnedScatterplot";
+import Legend from "./visualizations/Legend";
 import { Config, TopLevelSpec, compile } from "vega-lite";
 import ScagnosticsDisplay from "./components/ScagnosticsDisplay";
 
@@ -60,12 +61,6 @@ function App() {
 			console.log(ogScagnostics);
 			console.log(originalData!.binData(32, 32));
 			console.log(privBinnedData2D);
-			console.log(
-				privBinnedData2D?.getUnbinnedData(
-					originalData.xRange,
-					originalData.yRange
-				)
-			);
 			Scatterplot(
 				originalData!.data.map((d) => {
 					return { x: d[0], y: d[1] };
@@ -80,13 +75,13 @@ function App() {
 					yFormat: ".2f",
 					xLabel: "x",
 					yLabel: "y",
-					width: 300,
-					height: 300,
+					width: 400,
+					height: 400,
 					stroke: "rgba(139, 139, 255, 0.2)",
 					svgNodeSelector: "#og-scatterplot",
 				}
 			);
-			BinnedScatterplot(originalData.binData(32, 32), {
+			let b1 = BinnedScatterplot(originalData.binData(32, 32), {
 				x: (d: any) => d.x,
 				y: (d: any) => d.y,
 				title: (d: any) => "",
@@ -96,14 +91,15 @@ function App() {
 				yFormat: ".2f",
 				xLabel: "x",
 				yLabel: "y",
-				width: 300,
-				height: 300,
+				width: 400,
+				height: 400,
 				stroke: "rgba(139, 139, 255, 0.2)",
 				svgNodeSelector: "#og-binned-scatterplot",
 				xNumBins: 32,
 				yNumBins: 32,
 			});
-			BinnedScatterplot(privBinnedData2D!.data, {
+			Legend(b1.colorScale, {title: "# data points", svgSelector: "#og-binned-scatterplot-legend", tickFormat: undefined, tickValues: undefined});
+			let b2 = BinnedScatterplot(privBinnedData2D!.data, {
 				x: (d: any) => d.x,
 				y: (d: any) => d.y,
 				title: (d: any) => "",
@@ -113,16 +109,19 @@ function App() {
 				yFormat: ".2f",
 				xLabel: "x",
 				yLabel: "y",
-				width: 300,
-				height: 300,
+				width: 400,
+				height: 400,
 				stroke: "rgba(139, 139, 255, 0.2)",
 				svgNodeSelector: "#priv-binned-scatterplot",
 				xNumBins: 32,
 				yNumBins: 32,
 			});
+			Legend(b2.colorScale, {title: "# data points", svgSelector: "#priv-binned-scatterplot-legend", tickFormat: undefined, tickValues: undefined});
 			let unbinned = privBinnedData2D!.getUnbinnedData(
 				originalData.xRange,
-				originalData.yRange
+				originalData.yRange,
+				originalData.xMin,
+				originalData.yMin
 			);
 			setUnbinScagnostics(new Scagnostics(unbinned.data));
 			Scatterplot(
@@ -139,8 +138,8 @@ function App() {
 					yFormat: ".2f",
 					xLabel: "x",
 					yLabel: "y",
-					width: 300,
-					height: 300,
+					width: 400,
+					height: 400,
 					stroke: "rgba(139, 139, 255, 0.2)",
 					svgNodeSelector: "#priv-unbinned-scatterplot",
 				}
@@ -167,14 +166,24 @@ function App() {
 			</div>
 			<div className="plots">
 				<div>
+					<h3>Original Data</h3>
 					<svg id="og-scatterplot"></svg>
 					<ScagnosticsDisplay
 						scagnostics={ogScagnostics}
 					></ScagnosticsDisplay>
 				</div>
-				<svg id="og-binned-scatterplot"></svg>
-				<svg id="priv-binned-scatterplot"></svg>
 				<div>
+					<h3>Original Binned Data</h3>
+					<svg id="og-binned-scatterplot"></svg>
+					<svg id="og-binned-scatterplot-legend"></svg>
+				</div>
+				<div>
+					<h3>Privatized Binned Data ( DAWA, epsilon=0.5, bins=32) </h3>
+					<svg id="priv-binned-scatterplot"></svg>
+					<svg id="priv-binned-scatterplot-legend"></svg>
+				</div>
+				<div>
+					<h3>Unbinned version of private data</h3>
 					<svg id="priv-unbinned-scatterplot"></svg>
 					<ScagnosticsDisplay
 						scagnostics={unbinScagnostics}
