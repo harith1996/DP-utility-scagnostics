@@ -22,6 +22,7 @@ import { RectangularBinner } from "./modules/rectangularbinner";
  * @param options   Scagnostics options {binType,startBinGridSize, isNormalized, isBinned, outlyingUpperBound, minBins, maxBins}
  * @return scag Scagnostics object with scores and intermediate computation results.
  */
+// eslint-disable-next-line import/no-anonymous-default-export
 export default class {
 	constructor(inputPoints, options = {}) {
 		let thisInstance = this;
