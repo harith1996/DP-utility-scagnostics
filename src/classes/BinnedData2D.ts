@@ -1,19 +1,24 @@
 import Data2D from "./Data2D";
 export default class BinnedData2D {
 	data: number[][];
-    numberOfBins: number;
+	numberOfBins: number;
 	constructor(data: number[][]) {
 		this.data = data;
-        this.numberOfBins = data.length;
+		this.numberOfBins = data.length;
 	}
 
-    /**
-     * 
-     * @param xRange 
-     * @param yRange 
-     * @returns 
-     */
-	getUnbinnedData(xRange: number, yRange: number) {
+	/**
+	 *
+	 * @param xRange
+	 * @param yRange
+	 * @returns
+	 */
+	getUnbinnedData(
+		xRange: number,
+		yRange: number,
+		xMin: number,
+		yMin: number
+	) {
 		let n = this.numberOfBins;
 		let unbinnedData = [];
 		for (let i = 0; i < n; i++) {
@@ -24,13 +29,15 @@ export default class BinnedData2D {
 				let x2 = ((i + 1) * xRange) / n;
 				let y2 = ((j + 1) * yRange) / n;
 				for (let k = 0; k < numberOfPoints; k++) {
-					let x = Math.random() * (x2 - x1) + x1;
-					let y = Math.random() * (y2 - y1) + y1;
+					let x = xMin + Math.random() * (x2 - x1) + x1;
+					let y = yMin + Math.random() * (y2 - y1) + y1;
+					// let x = Math.random() * (x2 - x1) + x1;
+					// let y = Math.random() * (y2 - y1) + y1;
 					unbinnedData.push([x, y]);
 				}
 			}
 		}
-        return new Data2D(unbinnedData);
+		return new Data2D(unbinnedData);
 	}
 
 	getNumberOfBins() {
@@ -38,7 +45,7 @@ export default class BinnedData2D {
 	}
 
 	transposeData() {
-		let newData : number[][] = [];
+		let newData: number[][] = [];
 		for (let i = 0; i < this.data.length; i++) {
 			newData.push([]);
 			for (let j = 0; j < this.data.length; j++) {
