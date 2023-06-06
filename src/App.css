@@ -74,3 +74,10 @@
 #legend-container div{
   margin-left: 20px;
 }
+
+.plots{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
