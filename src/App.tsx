@@ -64,7 +64,7 @@ function App() {
 		});
 	};
 
-	//set unbinned data from priv binned data
+	//transpose DP output, set unbinned data from priv binned data
 	useEffect(() => {
 		if (originalData && privBinnedData2D) {
 			privBinnedData2D.transposeData();
