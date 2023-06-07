@@ -63,17 +63,39 @@ function App() {
 			setPrivBinnedData2D(new BinnedData2D(dataValues));
 		});
 	};
+
+	//set unbinned data from priv binned data
 	useEffect(() => {
 		if (originalData && privBinnedData2D) {
-			setOGScagnostics(new Scagnostics(originalData.data));
 			privBinnedData2D.transposeData();
+			let unbinnedData = privBinnedData2D.getUnbinnedData(
+				originalData.xRange,
+				originalData.yRange,
+				originalData.xMin,
+				originalData.yMin
+			);
+			setPrivUnbinnedData(new Data2D(unbinnedData.data));
 		}
 	}, [originalData, privBinnedData2D]);
+
+	//compute scagnostics
+	useEffect(() => {
+		if (originalData) {
+			setOGScagnostics(new Scagnostics(originalData.data));
+		}
+		if (privUnbinnedData2D) {
+			setUnbinScagnostics(new Scagnostics(privUnbinnedData2D.data));
+		}
+	}, [originalData && privUnbinnedData2D]);
+
+	//console log and show plots
 	useEffect(() => {
 		if (ogScagnostics && originalData) {
 			console.log(ogScagnostics);
 			console.log(originalData!.binData(32, 32));
 			console.log(privBinnedData2D);
+
+			//original data scatterplot
 			Scatterplot(
 				originalData!.data.map((d) => {
 					return { x: d[0], y: d[1] };
@@ -90,6 +112,8 @@ function App() {
 					scatterplotSpec
 				)
 			);
+
+			//original data binned scatterplot
 			let b1 = BinnedScatterplot(
 				originalData.binData(32, 32),
 				Object.assign(
@@ -109,6 +133,8 @@ function App() {
 				tickFormat: undefined,
 				tickValues: undefined,
 			});
+
+			//private data binned scatterplot
 			let b2 = BinnedScatterplot(
 				privBinnedData2D!.data,
 				Object.assign(
@@ -128,21 +154,16 @@ function App() {
 				tickFormat: undefined,
 				tickValues: undefined,
 			});
-			let unbinned = privBinnedData2D!.getUnbinnedData(
-				originalData.xRange,
-				originalData.yRange,
-				originalData.xMin,
-				originalData.yMin
-			);
-			setUnbinScagnostics(new Scagnostics(unbinned.data));
+
+			//private data unbinned scatterplot
 			Scatterplot(
-				unbinned.data.map((d) => {
+				privUnbinnedData2D!.data.map((d) => {
 					return { x: d[0], y: d[1] };
 				}),
 				Object.assign(
 					{
-						xDomain: [unbinned.xMin, unbinned.xMax],
-						yDomain: [unbinned.yMin, unbinned.yMax],
+						xDomain: [privUnbinnedData2D!.xMin, privUnbinnedData2D!.xMax],
+						yDomain: [privUnbinnedData2D!.yMin, privUnbinnedData2D!.yMax],
 						svgNodeSelector: "#priv-unbinned-scatterplot",
 					},
 					scatterplotSpec
