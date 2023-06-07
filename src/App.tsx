@@ -16,6 +16,19 @@ type Data = {
 	y: number;
 };
 
+let scatterplotSpec = {
+	x: (d: any) => d.x,
+	y: (d: any) => d.y,
+	title: (d: any) => "",
+	xFormat: ".2f",
+	yFormat: ".2f",
+	xLabel: "x",
+	yLabel: "y",
+	width: 400,
+	height: 400,
+	stroke: "rgba(139, 139, 255, 0.2)",
+};
+
 /* eslint-disable-next-line no-restricted-globals */
 function App() {
 	const [originalData, setOriginalData] = React.useState<Data2D | undefined>(
@@ -65,58 +78,56 @@ function App() {
 				originalData!.data.map((d) => {
 					return { x: d[0], y: d[1] };
 				}),
-				{
-					x: (d: any) => d.x,
-					y: (d: any) => d.y,
-					title: (d: any) => "",
-					xDomain: [originalData.xMin, originalData.xMax],
-					yDomain: [originalData.yMin, originalData.yMax],
-					xFormat: ".2f",
-					yFormat: ".2f",
-					xLabel: "x",
-					yLabel: "y",
-					width: 400,
-					height: 400,
-					stroke: "rgba(139, 139, 255, 0.2)",
-					svgNodeSelector: "#og-scatterplot",
-				}
+				Object.assign(
+					{
+						x: (d: any) => d.x,
+						y: (d: any) => d.y,
+						title: (d: any) => "",
+						xDomain: [originalData.xMin, originalData.xMax],
+						yDomain: [originalData.yMin, originalData.yMax],
+						svgNodeSelector: "#og-scatterplot",
+					},
+					scatterplotSpec
+				)
 			);
-			let b1 = BinnedScatterplot(originalData.binData(32, 32), {
-				x: (d: any) => d.x,
-				y: (d: any) => d.y,
-				title: (d: any) => "",
-				xDomain: [originalData.xMin, originalData.xMax],
-				yDomain: [originalData.yMin, originalData.yMax],
-				xFormat: ".2f",
-				yFormat: ".2f",
-				xLabel: "x",
-				yLabel: "y",
-				width: 400,
-				height: 400,
-				stroke: "rgba(139, 139, 255, 0.2)",
-				svgNodeSelector: "#og-binned-scatterplot",
-				xNumBins: 32,
-				yNumBins: 32,
+			let b1 = BinnedScatterplot(
+				originalData.binData(32, 32),
+				Object.assign(
+					{
+						xDomain: [originalData.xMin, originalData.xMax],
+						yDomain: [originalData.yMin, originalData.yMax],
+						svgNodeSelector: "#og-binned-scatterplot",
+						xNumBins: 32,
+						yNumBins: 32,
+					},
+					scatterplotSpec
+				)
+			);
+			Legend(b1.colorScale, {
+				title: "# data points",
+				svgSelector: "#og-binned-scatterplot-legend",
+				tickFormat: undefined,
+				tickValues: undefined,
 			});
-			Legend(b1.colorScale, {title: "# data points", svgSelector: "#og-binned-scatterplot-legend", tickFormat: undefined, tickValues: undefined});
-			let b2 = BinnedScatterplot(privBinnedData2D!.data, {
-				x: (d: any) => d.x,
-				y: (d: any) => d.y,
-				title: (d: any) => "",
-				xDomain: [originalData.xMin, originalData.xMax],
-				yDomain: [originalData.yMin, originalData.yMax],
-				xFormat: ".2f",
-				yFormat: ".2f",
-				xLabel: "x",
-				yLabel: "y",
-				width: 400,
-				height: 400,
-				stroke: "rgba(139, 139, 255, 0.2)",
-				svgNodeSelector: "#priv-binned-scatterplot",
-				xNumBins: 32,
-				yNumBins: 32,
+			let b2 = BinnedScatterplot(
+				privBinnedData2D!.data,
+				Object.assign(
+					{
+						xDomain: [originalData.xMin, originalData.xMax],
+						yDomain: [originalData.yMin, originalData.yMax],
+						svgNodeSelector: "#priv-binned-scatterplot",
+						xNumBins: 32,
+						yNumBins: 32,
+					},
+					scatterplotSpec
+				)
+			);
+			Legend(b2.colorScale, {
+				title: "# data points",
+				svgSelector: "#priv-binned-scatterplot-legend",
+				tickFormat: undefined,
+				tickValues: undefined,
 			});
-			Legend(b2.colorScale, {title: "# data points", svgSelector: "#priv-binned-scatterplot-legend", tickFormat: undefined, tickValues: undefined});
 			let unbinned = privBinnedData2D!.getUnbinnedData(
 				originalData.xRange,
 				originalData.yRange,
@@ -128,21 +139,14 @@ function App() {
 				unbinned.data.map((d) => {
 					return { x: d[0], y: d[1] };
 				}),
-				{
-					x: (d: any) => d.x,
-					y: (d: any) => d.y,
-					title: (d: any) => "",
-					xDomain: [unbinned.xMin, unbinned.xMax],
-					yDomain: [unbinned.yMin, unbinned.yMax],
-					xFormat: ".2f",
-					yFormat: ".2f",
-					xLabel: "x",
-					yLabel: "y",
-					width: 400,
-					height: 400,
-					stroke: "rgba(139, 139, 255, 0.2)",
-					svgNodeSelector: "#priv-unbinned-scatterplot",
-				}
+				Object.assign(
+					{
+						xDomain: [unbinned.xMin, unbinned.xMax],
+						yDomain: [unbinned.yMin, unbinned.yMax],
+						svgNodeSelector: "#priv-unbinned-scatterplot",
+					},
+					scatterplotSpec
+				)
 			);
 		}
 	}, [ogScagnostics]);
@@ -178,7 +182,9 @@ function App() {
 					<svg id="og-binned-scatterplot-legend"></svg>
 				</div>
 				<div>
-					<h3>Privatized Binned Data ( DAWA, epsilon=0.5, bins=32) </h3>
+					<h3>
+						Privatized Binned Data ( DAWA, epsilon=0.5, bins=32){" "}
+					</h3>
 					<svg id="priv-binned-scatterplot"></svg>
 					<svg id="priv-binned-scatterplot-legend"></svg>
 				</div>
