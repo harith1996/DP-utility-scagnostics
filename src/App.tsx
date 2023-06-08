@@ -7,7 +7,8 @@ import Scagnostics from "./lib/scagnostics.js";
 
 //import components
 import FileUploadSingle from "./components/FileUploadSingle";
-import ScagnosticsDisplay from "./components/ScagnosticsDisplay";
+import ScagnosticsTable from "./components/ScagnosticsTable";
+import Plots from "./components/Plots";
 
 //import classes
 import BinnedData2D from "./classes/BinnedData2D";
@@ -20,24 +21,6 @@ import Legend from "./visualizations/Legend";
 
 //import services
 import * as dataService from "./services/dataService";
-
-type Data = {
-	x: number;
-	y: number;
-};
-
-let scatterplotSpec = {
-	x: (d: any) => d.x,
-	y: (d: any) => d.y,
-	title: (d: any) => "",
-	xFormat: ".2f",
-	yFormat: ".2f",
-	xLabel: "x",
-	yLabel: "y",
-	width: 400,
-	height: 400,
-	stroke: "rgba(139, 139, 255, 0.2)",
-};
 
 /* eslint-disable-next-line no-restricted-globals */
 function App() {
@@ -93,103 +76,24 @@ function App() {
 		if (originalData) {
 			setOGScagnostics(new Scagnostics(originalData.data));
 		}
+	}, [originalData]);
+
+	useEffect(() => {
 		if (privUnbinnedData2D) {
 			setUnbinScagnostics(new Scagnostics(privUnbinnedData2D.data));
 		}
+	}, [privUnbinnedData2D]);
 
-		//test dataService
-		dataService.getDatasets("private").then((data) => {
-			console.log(data);
-		});
-	}, [originalData && privUnbinnedData2D]);
-
-	//console log and show plots
+	//console log
 	useEffect(() => {
 		if (ogScagnostics && originalData) {
 			console.log(ogScagnostics);
 			console.log(originalData!.binData(32, 32));
 			console.log(privBinnedData2D);
-
-			//original data scatterplot
-			Scatterplot(
-				originalData!.data.map((d) => {
-					return { x: d[0], y: d[1] };
-				}),
-				Object.assign(
-					{
-						x: (d: any) => d.x,
-						y: (d: any) => d.y,
-						title: (d: any) => "",
-						xDomain: [originalData.xMin, originalData.xMax],
-						yDomain: [originalData.yMin, originalData.yMax],
-						svgNodeSelector: "#og-scatterplot",
-					},
-					scatterplotSpec
-				)
-			);
-
-			//original data binned scatterplot
-			let b1 = BinnedScatterplot(
-				originalData.binData(32, 32),
-				Object.assign(
-					{
-						xDomain: [originalData.xMin, originalData.xMax],
-						yDomain: [originalData.yMin, originalData.yMax],
-						svgNodeSelector: "#og-binned-scatterplot",
-						xNumBins: 32,
-						yNumBins: 32,
-					},
-					scatterplotSpec
-				)
-			);
-			Legend(b1.colorScale, {
-				title: "# data points",
-				svgSelector: "#og-binned-scatterplot-legend",
-				tickFormat: undefined,
-				tickValues: undefined,
+			//test dataService
+			dataService.getDatasets("private").then((data) => {
+				console.log(data);
 			});
-
-			//private data binned scatterplot
-			let b2 = BinnedScatterplot(
-				privBinnedData2D!.data,
-				Object.assign(
-					{
-						xDomain: [originalData.xMin, originalData.xMax],
-						yDomain: [originalData.yMin, originalData.yMax],
-						svgNodeSelector: "#priv-binned-scatterplot",
-						xNumBins: 32,
-						yNumBins: 32,
-					},
-					scatterplotSpec
-				)
-			);
-			Legend(b2.colorScale, {
-				title: "# data points",
-				svgSelector: "#priv-binned-scatterplot-legend",
-				tickFormat: undefined,
-				tickValues: undefined,
-			});
-
-			//private data unbinned scatterplot
-			Scatterplot(
-				privUnbinnedData2D!.data.map((d) => {
-					return { x: d[0], y: d[1] };
-				}),
-				Object.assign(
-					{
-						xDomain: [
-							privUnbinnedData2D!.xMin,
-							privUnbinnedData2D!.xMax,
-						],
-						yDomain: [
-							privUnbinnedData2D!.yMin,
-							privUnbinnedData2D!.yMax,
-						],
-						svgNodeSelector: "#priv-unbinned-scatterplot",
-					},
-					scatterplotSpec
-				)
-			);
 		}
 	}, [ogScagnostics]);
 	return (
@@ -210,34 +114,27 @@ function App() {
 					></FileUploadSingle>
 				</div>
 			</div>
-			<div className="plots">
-				<div>
-					<h3>Original Data</h3>
-					<svg id="og-scatterplot"></svg>
-					<ScagnosticsDisplay
-						scagnostics={ogScagnostics}
-					></ScagnosticsDisplay>
-				</div>
-				<div>
-					<h3>Original Binned Data</h3>
-					<svg id="og-binned-scatterplot"></svg>
-					<svg id="og-binned-scatterplot-legend"></svg>
-				</div>
-				<div>
-					<h3>
-						Privatized Binned Data ( DAWA, epsilon=0.5, bins=32){" "}
-					</h3>
-					<svg id="priv-binned-scatterplot"></svg>
-					<svg id="priv-binned-scatterplot-legend"></svg>
-				</div>
-				<div>
-					<h3>Unbinned version of private data</h3>
-					<svg id="priv-unbinned-scatterplot"></svg>
-					<ScagnosticsDisplay
-						scagnostics={unbinScagnostics}
-					></ScagnosticsDisplay>
-				</div>
+			<div id="plots">
+				<Plots
+					plotInputs={[
+						{
+							unbinned: originalData,
+							binned: originalData?.binData(32, 32),
+							titleUnbinned: "Original Data",
+							titleBinned: "Original Data (Binned)"
+						},
+						{
+							unbinned: privUnbinnedData2D,
+							binned: privBinnedData2D,
+							titleUnbinned: "Private Data (Unbinned)",
+							titleBinned:
+								"Private Data (DAWA, bins = 32x32, epsilon=0.5)"
+						},
+					]}
+				></Plots>
 			</div>
+			
+			<ScagnosticsTable scagList={[ogScagnostics, unbinScagnostics]}></ScagnosticsTable>
 		</div>
 	);
 }
