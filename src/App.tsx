@@ -87,10 +87,6 @@ function App() {
 			console.log(ogScagnostics);
 			console.log(originalData!.binData(32, 32));
 			console.log(privBinnedData2D);
-			//test dataService
-			dataService.getDatasets("private").then((data) => {
-				console.log(data);
-			});
 		}
 	}, [ogScagnostics]);
 	return (
