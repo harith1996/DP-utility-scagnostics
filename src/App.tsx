@@ -114,27 +114,32 @@ function App() {
 					></FileUploadSingle>
 				</div>
 			</div>
-			<div id="plots">
-				<Plots
-					plotInputs={[
-						{
-							unbinned: originalData,
-							binned: originalData?.binData(32, 32),
-							titleUnbinned: "Original Data",
-							titleBinned: "Original Data (Binned)"
-						},
-						{
-							unbinned: privUnbinnedData2D,
-							binned: privBinnedData2D,
-							titleUnbinned: "Private Data (Unbinned)",
-							titleBinned:
-								"Private Data (DAWA, bins = 32x32, epsilon=0.5)"
-						},
-					]}
-				></Plots>
+			<div id="content">
+				<div id="plots">
+					<Plots
+						plotInputs={[
+							{
+								unbinned: originalData,
+								binned: originalData?.binData(32, 32),
+								titleUnbinned: "Original Data",
+								titleBinned: "Original Data (Binned)",
+							},
+							{
+								unbinned: privUnbinnedData2D,
+								binned: privBinnedData2D,
+								titleUnbinned: "Private Data (Unbinned)",
+								titleBinned:
+									"Private Data (DAWA, bins = 32x32, epsilon=0.5)",
+							},
+						]}
+					></Plots>
+				</div>
+				<div>
+					<ScagnosticsTable
+						scagList={[ogScagnostics, unbinScagnostics]}
+					></ScagnosticsTable>
+				</div>
 			</div>
-			
-			<ScagnosticsTable scagList={[ogScagnostics, unbinScagnostics]}></ScagnosticsTable>
 		</div>
 	);
 }
