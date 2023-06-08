@@ -1,8 +1,11 @@
 import os
 from flask import Flask, jsonify
+from flask_cors import CORS, cross_origin
 import csv
 
 app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 ROOT_PATH = './backend/'
 
@@ -38,21 +41,25 @@ for filename in filenames['private']:
 
 #list available attributes
 @app.route('/attributes', methods=['GET'])
+@cross_origin()
 def list_attributes():
     return jsonify(list(unique.keys()))
 
 #list unqiue values
 @app.route('/attributes/unique/<attribute>', methods=['GET'])
+@cross_origin()
 def list_unique(attribute):
     return jsonify(list(unique[attribute]))
 
 #list datasets in a directory
 @app.route('/datasets/<dataType>', methods=['GET'])
+@cross_origin()
 def list_original_data(dataType):
     return jsonify(filenames[dataType])
 
 #get a specific dataset
 @app.route('/datasets/<dataType>/<filename>', methods=['GET'])
+@cross_origin()
 def get_data(dataType, filename):
     data = []
     path = ROOT_PATH + 'datasets/' + dataType + '/'  + filename
