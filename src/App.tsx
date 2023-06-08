@@ -1,15 +1,25 @@
 import React, { useEffect } from "react";
-import "./App.css";
-import Scagnostics from "./lib/scagnostics.js";
-import FileUploadSingle from "./components/FileUploadSingle";
 import { parse } from "papaparse";
+
+import "./App.css";
+//import libraries
+import Scagnostics from "./lib/scagnostics.js";
+
+//import components
+import FileUploadSingle from "./components/FileUploadSingle";
+import ScagnosticsDisplay from "./components/ScagnosticsDisplay";
+
+//import classes
 import BinnedData2D from "./classes/BinnedData2D";
 import Data2D from "./classes/Data2D";
+
+//import visualizations
 import Scatterplot from "./visualizations/Scatterplot";
 import BinnedScatterplot from "./visualizations/BinnedScatterplot";
 import Legend from "./visualizations/Legend";
-import { Config, TopLevelSpec, compile } from "vega-lite";
-import ScagnosticsDisplay from "./components/ScagnosticsDisplay";
+
+//import services
+import * as dataService from "./services/dataService";
 
 type Data = {
 	x: number;
@@ -86,6 +96,11 @@ function App() {
 		if (privUnbinnedData2D) {
 			setUnbinScagnostics(new Scagnostics(privUnbinnedData2D.data));
 		}
+
+		//test dataService
+		dataService.getDatasets("private").then((data) => {
+			console.log(data);
+		});
 	}, [originalData && privUnbinnedData2D]);
 
 	//console log and show plots
@@ -162,8 +177,14 @@ function App() {
 				}),
 				Object.assign(
 					{
-						xDomain: [privUnbinnedData2D!.xMin, privUnbinnedData2D!.xMax],
-						yDomain: [privUnbinnedData2D!.yMin, privUnbinnedData2D!.yMax],
+						xDomain: [
+							privUnbinnedData2D!.xMin,
+							privUnbinnedData2D!.xMax,
+						],
+						yDomain: [
+							privUnbinnedData2D!.yMin,
+							privUnbinnedData2D!.yMax,
+						],
 						svgNodeSelector: "#priv-unbinned-scatterplot",
 					},
 					scatterplotSpec
