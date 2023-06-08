@@ -1,47 +1,60 @@
 import React from "react";
-import {
-	Slider,
-	Select,
-	MenuItem,
-	FormControl,
-	InputLabel,
-	SelectChangeEvent,
-} from "@mui/material";
+import { useForm } from "react-hook-form";
 
-interface DPFilterProps {
-	datasetNames: string[];
-	epsilons: number[];
-	algorithms: string[];
-	numNumBins: number[];
-	features: string[];
+interface SubmitHandler {
+	onSubmit: (data: any) => void;
 }
 
-export default function Filters(props: DPFilterProps) {
-	const [epsilon, setEpsilon] = React.useState<number>(0.1);
-	const [algorithm, setAlgorithm] = React.useState<string>("Histogram");
-	const [numNumBin, setNumNumBin] = React.useState<number>(10);
-	const [feature, setFeature] = React.useState<string>("distribution");
-	const [datasetName, setDatasetName] = React.useState<string>("0");
-	const handleChange = (event: SelectChangeEvent<{ value: any }>) => {
-		console.log(event.target.value);
-	};
+interface DPParams{
+	Dataset: string;
+	Features: string;
+	Algorithm: string;
+	Epsilon: string;
+	NumberOfBins: string;
+}
+
+export default function Filters(props: SubmitHandler) {
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+	} = useForm();
+	const onSubmit = (data: any) => {
+		console.log(data);
+		props.onSubmit(data as DPParams);
+	}
+
 	return (
-		<div>
-			<FormControl fullWidth>
-				<InputLabel id="demo-simple-select-label">Age</InputLabel>
-				<Select
-					labelId="demo-simple-select-label"
-					id="demo-simple-select"
-					value={""}
-					label="Age"
-					onChange={handleChange}
-				>
-					{/* Create a MenuItem for each datasetName */}
-					{props.datasetNames.map((datasetName) => (
-						<MenuItem value={datasetName}>{datasetName}</MenuItem>
-					))}
-				</Select>
-			</FormControl>
-		</div>
+		<form onSubmit={handleSubmit(onSubmit)}>
+			<select {...register("Dataset", { required: true })}>
+				<option value="0">0</option>
+				<option value="2">2</option>
+				<option value="3">3</option>
+				<option value="9">9</option>
+			</select>
+			<select {...register("Features", { required: true })}>
+				<option value="distribution">distribution</option>
+				<option value="correlation">correlation</option>
+				<option value="clusters">clusters</option>
+			</select>
+			<select {...register("Algorithm", { required: true })}>
+				<option value="DAWA">DAWA</option>
+				<option value="AGrid">AGrid</option>
+				<option value="AHP">AHP</option>
+				<option value="Geometric">Geometric</option>
+			</select>
+			<select {...register("Epsilon", { required: true })}>
+				<option value="0.5">0.5</option>
+				<option value="0.1">0.1</option>
+				<option value="0.05">0.05</option>
+				<option value="0.01">0.01</option>
+			</select>
+			<select {...register("Number of bins", { required: true })}>
+				<option value="32">32x32</option>
+				<option value="64">64x64</option>
+			</select>
+
+			<input type="submit" />
+		</form>
 	);
 }

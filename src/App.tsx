@@ -18,9 +18,11 @@ import Data2D from "./classes/Data2D";
 
 //import services
 import * as dataService from "./services/dataService";
+import Filters from "./components/Filters";
 
 /* eslint-disable-next-line no-restricted-globals */
 function App() {
+	const [originalDataName, setOriginalDataName] = React.useState<string>("");
 	const [originalData, setOriginalData] = React.useState<Data2D | undefined>(
 		undefined
 	);
@@ -40,19 +42,27 @@ function App() {
 		);
 	};
 	const handleOriginalData = (data: File | undefined) => {
-		data!.text().then((data) => {
+		data?.text().then((data) => {
 			let parsedData = parse(data, { header: true }).data;
 			let dataValues = extractDataValues(parsedData).slice(0, -1);
 			setOriginalData(new Data2D(dataValues));
 		});
 	};
 	const handlePrivBinnedData = (data: File | undefined) => {
-		data!.text().then((data) => {
+		data?.text().then((data) => {
 			let parsedData = parse(data, { header: false }).data;
 			let dataValues = extractDataValues(parsedData).slice(0, -1);
 			setPrivBinnedData2D(new BinnedData2D(dataValues));
 		});
 	};
+
+	const handleParamChange = (params:any) => {
+		setOriginalDataName(params.Dataset);
+		dataService.getPrivateData(params).then((data) => {
+			let dataValues = extractDataValues(data).slice(0, -1);
+			setPrivBinnedData2D(new BinnedData2D(dataValues));
+		});
+	}
 
 	//transpose DP output, set unbinned data from priv binned data
 	useEffect(() => {
@@ -81,11 +91,20 @@ function App() {
 		}
 	}, [privUnbinnedData2D]);
 
+	//fetch original data from server
+	useEffect(()=>{
+		if(originalDataName){
+			dataService.getDataset("original", originalDataName + ".csv").then((data) => {
+				let dataValues = extractDataValues(data).slice(0, -1);
+				setOriginalData(new Data2D(dataValues));
+			});
+		}
+	}, [originalDataName])
+
 	//console log
 	useEffect(() => {
 		if (ogScagnostics && originalData) {
 			console.log(ogScagnostics);
-			console.log(originalData!.binData(32, 32));
 			console.log(privBinnedData2D);
 		}
 	}, [ogScagnostics]);
@@ -107,6 +126,7 @@ function App() {
 					></FileUploadSingle>
 				</div>
 			</div>
+				<Filters onSubmit={handleParamChange}></Filters>
 			<div id="content">
 				<div id="plots">
 					<Plots
