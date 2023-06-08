@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import * as d3 from "d3";
 interface ScagnosticsDisplayProps {
 	scagList: Array<any>;
 }

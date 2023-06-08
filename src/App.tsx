@@ -15,9 +15,6 @@ import BinnedData2D from "./classes/BinnedData2D";
 import Data2D from "./classes/Data2D";
 
 //import visualizations
-import Scatterplot from "./visualizations/Scatterplot";
-import BinnedScatterplot from "./visualizations/BinnedScatterplot";
-import Legend from "./visualizations/Legend";
 
 //import services
 import * as dataService from "./services/dataService";
