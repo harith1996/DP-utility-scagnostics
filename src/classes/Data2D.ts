@@ -1,3 +1,5 @@
+import BinnedData2D from "./BinnedData2D";
+
 //export a class for two dimensional data
 export default class Data2D {
     data: number[][];
@@ -74,6 +76,6 @@ export default class Data2D {
             yBin = yBin > numBinsY - 1 ? numBinsY - 1 : yBin;
             binnedData[xBin][yBin]++;
         }
-        return binnedData;
+        return new BinnedData2D(binnedData);
     }
 }
