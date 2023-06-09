@@ -41,26 +41,14 @@ function App() {
 			Object.values(d).map((v: any) => parseFloat(v))
 		);
 	};
-	const handleOriginalData = (data: File | undefined) => {
-		data?.text().then((data) => {
-			let parsedData = parse(data, { header: true }).data;
-			let dataValues = extractDataValues(parsedData).slice(0, -1);
-			setOriginalData(new Data2D(dataValues));
-		});
-	};
-	const handlePrivBinnedData = (data: File | undefined) => {
-		data?.text().then((data) => {
-			let parsedData = parse(data, { header: false }).data;
-			let dataValues = extractDataValues(parsedData).slice(0, -1);
-			setPrivBinnedData2D(new BinnedData2D(dataValues));
-		});
-	};
 
 	const handleParamChange = (params: any) => {
 		setOriginalDataName(params.Dataset);
 		dataService.getPrivateData(params).then((data) => {
 			let dataValues = extractDataValues(data).slice(0, -1);
-			setPrivBinnedData2D(new BinnedData2D(dataValues));
+			const binnedData = new BinnedData2D(dataValues);
+			binnedData.transposeData();
+			setPrivBinnedData2D(binnedData);
 		});
 	};
 
@@ -76,11 +64,6 @@ function App() {
 			setPrivUnbinnedData(new Data2D(unbinnedData.data));
 		}
 	}, [originalData, privBinnedData2D]);
-
-	//transpose DP output
-	useEffect(() => {
-		privBinnedData2D?.transposeData();
-	}, [privBinnedData2D]);
 
 	//compute scagnostics
 	useEffect(() => {
@@ -116,22 +99,6 @@ function App() {
 	}, [ogScagnostics]);
 	return (
 		<div className="App">
-			<div className="loader">
-				<div>
-					Upload Original Unbinned Data (.csv)
-					<FileUploadSingle
-						fileExtension=".csv"
-						onUpload={handleOriginalData}
-					></FileUploadSingle>
-				</div>
-				<div>
-					Upload Private Binned Data (.csv)
-					<FileUploadSingle
-						fileExtension=".csv"
-						onUpload={handlePrivBinnedData}
-					></FileUploadSingle>
-				</div>
-			</div>
 			<Filters onSubmit={handleParamChange}></Filters>
 			<div id="content">
 				<div id="plots">
@@ -142,6 +109,8 @@ function App() {
 								binned: originalData?.binData(32, 32),
 								titleUnbinned: "Original Data",
 								titleBinned: "Original Data (Binned)",
+								xDomain: undefined,
+								yDomain: undefined
 							},
 							{
 								unbinned: privUnbinnedData2D,
@@ -149,6 +118,8 @@ function App() {
 								titleUnbinned: "Private Data (Unbinned)",
 								titleBinned:
 									"Private Data (DAWA, bins = 32x32, epsilon=0.5)",
+								xDomain: [originalData?.xMin, originalData?.xMax],
+								yDomain: [originalData?.yMin, originalData?.yMax]
 							},
 						]}
 					></Plots>
