@@ -64,7 +64,10 @@ def get_data(dataType, filename):
     data = []
     path = ROOT_PATH + 'datasets/' + dataType + '/'  + filename
     with open(path, 'r') as file:
-        csv_reader = csv.DictReader(file)
+        if(dataType == 'private'):
+            csv_reader = csv.reader(file)
+        else:
+            csv_reader = csv.DictReader(file)
         for row in csv_reader:
             data.append(row)
     return jsonify(data)
