@@ -56,18 +56,17 @@ function App() {
 		});
 	};
 
-	const handleParamChange = (params:any) => {
+	const handleParamChange = (params: any) => {
 		setOriginalDataName(params.Dataset);
 		dataService.getPrivateData(params).then((data) => {
 			let dataValues = extractDataValues(data).slice(0, -1);
 			setPrivBinnedData2D(new BinnedData2D(dataValues));
 		});
-	}
+	};
 
-	//transpose DP output, set unbinned data from priv binned data
+	//set unbinned data from priv binned data
 	useEffect(() => {
 		if (originalData && privBinnedData2D) {
-			privBinnedData2D.transposeData();
 			let unbinnedData = privBinnedData2D.getUnbinnedData(
 				originalData.xRange,
 				originalData.yRange,
@@ -77,6 +76,11 @@ function App() {
 			setPrivUnbinnedData(new Data2D(unbinnedData.data));
 		}
 	}, [originalData, privBinnedData2D]);
+
+	//transpose DP output
+	useEffect(() => {
+		privBinnedData2D?.transposeData();
+	}, [privBinnedData2D]);
 
 	//compute scagnostics
 	useEffect(() => {
@@ -92,14 +96,16 @@ function App() {
 	}, [privUnbinnedData2D]);
 
 	//fetch original data from server
-	useEffect(()=>{
-		if(originalDataName){
-			dataService.getDataset("original", originalDataName + ".csv").then((data) => {
-				let dataValues = extractDataValues(data).slice(0, -1);
-				setOriginalData(new Data2D(dataValues));
-			});
+	useEffect(() => {
+		if (originalDataName) {
+			dataService
+				.getDataset("original", originalDataName + ".csv")
+				.then((data) => {
+					let dataValues = extractDataValues(data).slice(0, -1);
+					setOriginalData(new Data2D(dataValues));
+				});
 		}
-	}, [originalDataName])
+	}, [originalDataName]);
 
 	//console log
 	useEffect(() => {
@@ -126,7 +132,7 @@ function App() {
 					></FileUploadSingle>
 				</div>
 			</div>
-				<Filters onSubmit={handleParamChange}></Filters>
+			<Filters onSubmit={handleParamChange}></Filters>
 			<div id="content">
 				<div id="plots">
 					<Plots
