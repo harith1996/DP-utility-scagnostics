@@ -11,6 +11,8 @@ interface PlotInput {
 	binned: BinnedData2D | undefined;
 	titleUnbinned: string | undefined;
 	titleBinned: string | undefined;
+	xDomain: Array<number | undefined> | undefined;
+	yDomain: Array<number | undefined> | undefined;
 }
 
 interface PlotsProps {
@@ -37,9 +39,14 @@ export default function Plots(props: PlotsProps) {
 		inputs.forEach(
 			(input, index) => {
 				if (
+					input !== undefined &&
 					input.unbinned !== undefined &&
 					input.binned !== undefined
 				) {
+					let xMin = (input.xDomain && input.xDomain[0]) || input.unbinned.xMin;
+					let xMax = (input.xDomain && input.xDomain[1]) || input.unbinned.xMax;
+					let yMin = (input.yDomain && input.yDomain[0]) || input.unbinned.yMin;
+					let yMax = (input.yDomain && input.yDomain[1]) || input.unbinned.yMax;
 					Scatterplot(
 						input.unbinned.data.map((d) => {
 							return { x: d[0], y: d[1] };
@@ -48,12 +55,10 @@ export default function Plots(props: PlotsProps) {
 							{
 								svgNodeSelector: `#scatterplot${index}`,
 								xDomain: [
-									input.unbinned.xMin,
-									input.unbinned.xMax,
+									xMin, xMax
 								],
 								yDomain: [
-									input.unbinned.yMin,
-									input.unbinned.yMax,
+									yMin, yMax
 								],
 							},
 							scatterplotSpec
