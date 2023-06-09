@@ -1,7 +1,7 @@
 //specifies the host of the backend server
 const HOST = "http://localhost:5000";
 
-\const buildFileNameFromParams = (params: any) => {
+const buildFileNameFromParams = (params: any) => {
     let parts = Object.values(params)
     return parts.join('_') + ".csv";
 
