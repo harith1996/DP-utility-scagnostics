@@ -22,7 +22,12 @@ const columns: GridColDef[] = [
 	{ field: "score2", headerName: "Score (private)", width: 200 },
 	{
 		field: "diff",
-		headerName: "Difference (original - private)",
+		headerName: "Difference (private - original)",
+		width: 200,
+	},
+	{
+		field: "diff_perc",
+		headerName: "Difference % (private - original)",
 		width: 200,
 	},
 	// {
@@ -50,13 +55,15 @@ export default function ScagnosticsTable(props: ScagnosticsDisplayProps) {
 			if (props.scagList[0].hasOwnProperty(score)) {
 				let score1 = props.scagList[0][score];
 				let score2 = props.scagList[1][score];
-				let diff = score1 - score2;
+				let diff = score2 - score1;
+				let diff_perc = (diff / score1) * 100;
 				rows.push({
 					id: score,
 					scoreName: score,
 					score1: score1?.toFixed(6),
 					score2: score2?.toFixed(6),
 					diff: diff?.toFixed(6),
+					diff_perc: diff_perc?.toFixed(6),
 				});
 			}
 		});
