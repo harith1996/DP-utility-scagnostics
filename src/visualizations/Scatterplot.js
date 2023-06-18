@@ -21,7 +21,7 @@ export default function Scatterplot(
 		insetRight = inset, // inset the default x-range
 		insetBottom = inset, // inset the default y-range
 		insetLeft = inset, // inset the default x-range
-		width = 640, // outer width, in pixels
+		width = 400, // outer width, in pixels
 		height = 400, // outer height, in pixels
 		xType = d3.scaleLinear, // type of x-scale
 		xDomain, // [xmin, xmax]

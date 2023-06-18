@@ -27,8 +27,6 @@ const scatterplotSpec = {
 	yFormat: ".2f",
 	xLabel: "x",
 	yLabel: "y",
-	width: 400,
-	height: 400,
 	stroke: "rgba(139, 139, 255, 0.2)",
 };
 

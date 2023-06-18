@@ -16,8 +16,8 @@ export default function BinnedScatterplot(
 		insetRight = inset, // inset the default x-range
 		insetBottom = inset, // inset the default y-range
 		insetLeft = inset, // inset the default x-range
-		width = 640, // outer width, in pixels
-		height = 400, // outer height, in pixels
+		width = 330, // outer width, in pixels
+		height = 330, // outer height, in pixels
 		xType = d3.scaleLinear, // type of x-scale
 		xDomain, // [xmin, xmax]
 		xNumBins,
@@ -38,48 +38,22 @@ export default function BinnedScatterplot(
 	} = {}
 ) {
 	// Construct scales and axes.
-	const colorScale = d3.scaleSequential(d3.interpolateBlues).domain([0, 20]);
+	const colorScale = d3
+		.scaleSequential(d3.interpolateBlues)
+		.domain([0, 10]);
 	const xScale = xType(xDomain, xRange);
 	const yScale = yType(yDomain, yRange);
 	const xAxis = d3.axisBottom(xScale).ticks(width / 80, xFormat);
 	const yAxis = d3.axisLeft(yScale).ticks(height / 50, yFormat);
 
 	const svg = d3.select(svgNodeSelector);
-	r = r / (xNumBins/32);
+	r = width / xNumBins;
 	svg.selectAll("*").remove();
 
 	svg.attr("width", width)
 		.attr("height", height)
 		.attr("viewBox", [0, 0, width, height])
 		.attr("style", "max-width: 100%; height: auto; height: intrinsic;");
-
-	// svg.append("g")
-	// 	.attr("transform", `translate(0,${height - marginBottom})`)
-	// 	.call(xAxis)
-	// 	.call((g) => g.select(".domain").remove())
-	// 	.call((g) =>
-	// 		g
-	// 			.append("text")
-	// 			.attr("x", width)
-	// 			.attr("y", marginBottom - 4)
-	// 			.attr("fill", "currentColor")
-	// 			.attr("text-anchor", "end")
-	// 			.text(xLabel)
-	// 	);
-
-	// svg.append("g")
-	// 	.attr("transform", `translate(${marginLeft},0)`)
-	// 	.call(yAxis)
-	// 	.call((g) => g.select(".domain").remove())
-	// 	.call((g) =>
-	// 		g
-	// 			.append("text")
-	// 			.attr("x", -marginLeft)
-	// 			.attr("y", 10)
-	// 			.attr("fill", "currentColor")
-	// 			.attr("text-anchor", "start")
-	// 			.text(yLabel)
-	// 	);
 
 	let plot = svg.append("g");
 	// Add rows of rect
@@ -110,5 +84,5 @@ export default function BinnedScatterplot(
 		"transform",
 		`rotate(-90, ${width / 2}, ${height / 2}) translate(${20},0)`
 	);
-	return {colorScale : colorScale};
+	return { colorScale: colorScale };
 }
