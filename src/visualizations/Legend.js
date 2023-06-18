@@ -39,12 +39,14 @@ export default function Legend(color, {
     let tickAdjust = g => g.selectAll(".tick line").attr("y1", marginTop + marginBottom - height);
     let x;
   
+	svg.selectAll("*").remove();
     // Continuous
     if (color.interpolate) {
       const n = Math.min(color.domain().length, color.range().length);
   
       x = color.copy().rangeRound(d3.quantize(d3.interpolate(marginLeft, width - marginRight), n));
   
+
       svg.append("image")
           .attr("x", marginLeft)
           .attr("y", marginTop)
