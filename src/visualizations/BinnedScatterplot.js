@@ -45,7 +45,7 @@ export default function BinnedScatterplot(
 	const yAxis = d3.axisLeft(yScale).ticks(height / 50, yFormat);
 
 	const svg = d3.select(svgNodeSelector);
-
+	r = r / (xNumBins/32);
 	svg.selectAll("*").remove();
 
 	svg.attr("width", width)

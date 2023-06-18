@@ -26,6 +26,9 @@ function App() {
 	const [originalData, setOriginalData] = React.useState<Data2D | undefined>(
 		undefined
 	);
+	const [binnedData, setBinnedData] = React.useState<
+		BinnedData2D | undefined
+	>();
 	const [privBinnedData2D, setPrivBinnedData2D] = React.useState<
 		BinnedData2D | undefined
 	>(undefined);
@@ -36,6 +39,7 @@ function App() {
 	const [unbinScagnostics, setUnbinScagnostics] = React.useState<Scagnostics>(
 		[]
 	);
+	const [binningMode, setBinningMode] = React.useState<number>(32);
 	const extractDataValues = (data: any) => {
 		return data.map((d: any) =>
 			Object.values(d).map((v: any) => parseFloat(v))
@@ -44,6 +48,8 @@ function App() {
 
 	const handleParamChange = (params: any) => {
 		setOriginalDataName(params.Dataset);
+		setBinningMode(parseInt(params["Number of bins"]) || 32);
+
 		dataService.getPrivateData(params).then((data) => {
 			let dataValues = extractDataValues(data).slice(0, -1);
 			const binnedData = new BinnedData2D(dataValues);
@@ -52,8 +58,31 @@ function App() {
 		});
 	};
 
+	//fetch original data from server
+	useEffect(() => {
+		if (originalDataName) {
+			console.log("fetching original data");
+			dataService
+				.getDataset("original", originalDataName + ".csv")
+				.then((data) => {
+					let dataValues = extractDataValues(data).slice(0, -1);
+					setOriginalData(new Data2D(dataValues));
+				});
+		}
+	}, [originalDataName]);
+
+	//set binned data from original data
+	useEffect(() => {
+		if (originalData) {
+			console.log("setting binned data");
+			const b = originalData?.binData(binningMode, binningMode);
+			setBinnedData(b);
+		}
+	}, [originalData, binningMode]);
+
 	//set unbinned data from priv binned data
 	useEffect(() => {
+		console.log("setting unbinned data");
 		if (originalData && privBinnedData2D) {
 			let unbinnedData = privBinnedData2D.getUnbinnedData(
 				originalData.xRange,
@@ -68,35 +97,17 @@ function App() {
 	//compute scagnostics
 	useEffect(() => {
 		if (originalData) {
+			console.log("computing scagnostics - original");
 			setOGScagnostics(new Scagnostics(originalData.data));
 		}
 	}, [originalData]);
 
 	useEffect(() => {
 		if (privUnbinnedData2D) {
+			console.log("computing scagnostics - private unbinned");
 			setUnbinScagnostics(new Scagnostics(privUnbinnedData2D.data));
 		}
 	}, [privUnbinnedData2D]);
-
-	//fetch original data from server
-	useEffect(() => {
-		if (originalDataName) {
-			dataService
-				.getDataset("original", originalDataName + ".csv")
-				.then((data) => {
-					let dataValues = extractDataValues(data).slice(0, -1);
-					setOriginalData(new Data2D(dataValues));
-				});
-		}
-	}, [originalDataName]);
-
-	//console log
-	useEffect(() => {
-		if (ogScagnostics && originalData) {
-			console.log(ogScagnostics);
-			console.log(privBinnedData2D);
-		}
-	}, [ogScagnostics]);
 	return (
 		<div className="App">
 			<Filters onSubmit={handleParamChange}></Filters>
@@ -106,11 +117,11 @@ function App() {
 						plotInputs={[
 							{
 								unbinned: originalData,
-								binned: originalData?.binData(32, 32),
+								binned: binnedData,
 								titleUnbinned: "Original Data",
 								titleBinned: "Original Data (Binned)",
 								xDomain: undefined,
-								yDomain: undefined
+								yDomain: undefined,
 							},
 							{
 								unbinned: privUnbinnedData2D,
@@ -118,8 +129,14 @@ function App() {
 								titleUnbinned: "Private Data (Unbinned)",
 								titleBinned:
 									"Private Data (DAWA, bins = 32x32, epsilon=0.5)",
-								xDomain: [originalData?.xMin, originalData?.xMax],
-								yDomain: [originalData?.yMin, originalData?.yMax]
+								xDomain: [
+									originalData?.xMin,
+									originalData?.xMax,
+								],
+								yDomain: [
+									originalData?.yMin,
+									originalData?.yMax,
+								],
 							},
 						]}
 					></Plots>
