@@ -1,8 +1,9 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 
-interface SubmitHandler {
+interface FilterProps {
 	onSubmit: (data: any) => void;
+	data: DPParamUniqueValues;
 }
 
 interface DPParams {
@@ -12,7 +13,14 @@ interface DPParams {
 	NumberOfBins: string;
 }
 
-export default function Filters(props: SubmitHandler) {
+interface DPParamUniqueValues {
+	datasetNames: string[];
+	algorithms: string[];
+	epsilons: string[];
+	numBins: string[];
+}
+
+export default function Filters(props: FilterProps) {
 	const {
 		register,
 		handleSubmit,
@@ -23,45 +31,51 @@ export default function Filters(props: SubmitHandler) {
 		props.onSubmit(data as DPParams);
 	};
 
+	const data = props.data;
+
 	return (
 		<form className="filter-form" onSubmit={handleSubmit(onSubmit)}>
 			<div>
 				<label htmlFor="Dataset">Dataset</label>
 				<select {...register("Dataset", { required: true })}>
-					<option value="0">0</option>
-					<option value="2">2</option>
-					<option value="3">3</option>
-					<option value="9">9</option>
+					{/* for each dataset, create an option */}
+					{data.datasetNames?.map((dataset) => (
+						<option key={dataset} value={dataset}>{dataset}</option>
+					))}
 				</select>
 			</div>
 
 			<div>
 				<label>Algorithm</label>
 				<select {...register("Algorithm", { required: true })}>
-					<option value="DAWA">DAWA</option>
-					<option value="AGrid">AGrid</option>
-					<option value="AHP">AHP</option>
-					<option value="Geometric">Geometric</option>
+					{/* for each algorithm, create an option */}
+					{data.algorithms?.map((algo) => (
+						<option key= {algo} value={algo}>{algo}</option>
+					))}
 				</select>
 			</div>
 			<div>
 				<label>Epsilon</label>
 				<select {...register("Epsilon", { required: true })}>
-					<option value="0.5">0.5</option>
-					<option value="0.1">0.1</option>
-					<option value="0.05">0.05</option>
-					<option value="0.01">0.01</option>
+					{/* for each epsilon, create an option */}
+					{data.epsilons?.map((eps) => (
+						<option key = {eps} value={eps}>{eps}</option>
+					))}
 				</select>
 			</div>
 			<div>
 				<label>Number of bins</label>
 				<select {...register("Number of bins", { required: true })}>
-					<option value="32">32x32</option>
-					<option value="64">64x64</option>
+					{/* for each number of bins, create an option */}
+					{data.numBins?.map((num) => (
+						<option key = {num} value={num}>{num + "x" + num}</option>
+					))}
 				</select>
 			</div>
+			<div>
 
 			<input type="submit" />
+			</div>
 		</form>
 	);
 }

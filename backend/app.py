@@ -37,14 +37,24 @@ def parse_private_filename(filename):
 for filename in filenames['private']:
     parse_private_filename(filename)
 
+#convert the sets to lists
+for key in unique:
+    unique[key] = list(unique[key])
+
 #list available attributes
 @app.route('/attributes', methods=['GET'])
 @cross_origin()
 def list_attributes():
     return jsonify(list(unique.keys()))
 
+#list unique values of all attributes
+@app.route('/filterParams', methods=['GET'])
+@cross_origin()
+def filter_params():
+    return jsonify(unique)
+
 #list unqiue values
-@app.route('/attributes/unique/<attribute>', methods=['GET'])
+@app.route('/attributes/<attribute>/unique', methods=['GET'])
 @cross_origin()
 def list_unique(attribute):
     return jsonify(list(unique[attribute]))

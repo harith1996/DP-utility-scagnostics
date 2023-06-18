@@ -19,6 +19,7 @@ import Data2D from "./classes/Data2D";
 //import services
 import * as dataService from "./services/dataService";
 import Filters from "./components/Filters";
+import { filter } from "d3";
 
 /* eslint-disable-next-line no-restricted-globals */
 function App() {
@@ -46,10 +47,11 @@ function App() {
 		);
 	};
 
+	const [filterParams, setFilterParams] = React.useState<any>({});
+
 	const handleParamChange = (params: any) => {
 		setOriginalDataName(params.Dataset);
 		setBinningMode(parseInt(params["Number of bins"]) || 32);
-
 		dataService.getPrivateData(params).then((data) => {
 			let dataValues = extractDataValues(data).slice(0, -1);
 			const binnedData = new BinnedData2D(dataValues);
@@ -57,6 +59,13 @@ function App() {
 			setPrivBinnedData2D(binnedData);
 		});
 	};
+
+	//fetch filterParams
+	useEffect(() => {
+		dataService.getFilterParams().then((params) => {
+			setFilterParams(params);
+		});
+	}, []);
 
 	//fetch original data from server
 	useEffect(() => {
@@ -90,7 +99,7 @@ function App() {
 				originalData.xMin,
 				originalData.yMin
 			);
-			setPrivUnbinnedData(new Data2D(unbinnedData.data));
+			setPrivUnbinnedData(unbinnedData);
 		}
 	}, [originalData, privBinnedData2D]);
 
@@ -110,7 +119,7 @@ function App() {
 	}, [privUnbinnedData2D]);
 	return (
 		<div className="App">
-			<Filters onSubmit={handleParamChange}></Filters>
+			<Filters onSubmit={handleParamChange} data={filterParams}></Filters>
 			<div id="content">
 				<div id="plots">
 					<Plots

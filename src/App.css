@@ -123,6 +123,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: x-large;
 }
 
 .filter-form > div {
@@ -131,6 +132,14 @@
   align-items: center;
   justify-content: center;
   margin: 20px;
+  font-size: x-large;
+}
+
+.filter-form select {
+  font-size: x-large;
+}
+.filter-form input {
+  font-size: x-large;
 }
 .scag-table {
   display: flex;
