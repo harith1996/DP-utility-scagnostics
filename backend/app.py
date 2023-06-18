@@ -18,7 +18,6 @@ for dataType in ['original', 'private']:
 
 unique = {
     'datasetNames': set(),
-    'features': set(),
     'algorithms': set(),
     'epsilons': set(),
     'numBins': set()
@@ -31,10 +30,9 @@ def parse_private_filename(filename):
     filename = filename.split('_')
     #Push unique values to the lists
     unique['datasetNames'].add(filename[0])
-    unique['features'].add(filename[1])
-    unique['algorithms'].add(filename[2])
-    unique['epsilons'].add(filename[3])
-    unique['numBins'].add(filename[4])
+    unique['algorithms'].add(filename[1])
+    unique['epsilons'].add(filename[2])
+    unique['numBins'].add(filename[3])
 
 for filename in filenames['private']:
     parse_private_filename(filename)
