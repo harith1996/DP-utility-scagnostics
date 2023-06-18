@@ -7,7 +7,6 @@ interface SubmitHandler {
 
 interface DPParams{
 	Dataset: string;
-	Features: string;
 	Algorithm: string;
 	Epsilon: string;
 	NumberOfBins: string;
@@ -32,13 +31,6 @@ export default function Filters(props: SubmitHandler) {
 				<option value="2">2</option>
 				<option value="3">3</option>
 				<option value="9">9</option>
-			</select>
-			
-			<label>Features</label>
-			<select {...register("Features", { required: true })}>
-				<option value="distribution">distribution</option>
-				<option value="correlation">correlation</option>
-				<option value="clusters">clusters</option>
 			</select>
 
 			<label>Algorithm</label>
