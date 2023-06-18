@@ -71,7 +71,7 @@ export default function ScagnosticsTable(props: ScagnosticsDisplayProps) {
 	}, [props.scagList]);
 
 	return (
-		<div>
+		<div className="scag-table">
 			<h4>Scagnostics</h4>
 			<DataGrid rows={rows} columns={columns} />
 		</div>

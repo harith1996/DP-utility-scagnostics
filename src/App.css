@@ -118,3 +118,24 @@
   margin: 10px;
   display:flex;
 }
+
+.filter-form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.filter-form > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 20px;
+}
+.scag-table {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 20px;
+}
