@@ -40,7 +40,9 @@ export default function Filters(props: FilterProps) {
 				<select {...register("Dataset", { required: true })}>
 					{/* for each dataset, create an option */}
 					{data.datasetNames?.map((dataset) => (
-						<option key={dataset} value={dataset}>{dataset}</option>
+						<option key={dataset} value={dataset}>
+							{dataset}
+						</option>
 					))}
 				</select>
 			</div>
@@ -50,7 +52,9 @@ export default function Filters(props: FilterProps) {
 				<select {...register("Algorithm", { required: true })}>
 					{/* for each algorithm, create an option */}
 					{data.algorithms?.map((algo) => (
-						<option key= {algo} value={algo}>{algo}</option>
+						<option key={algo} value={algo}>
+							{algo}
+						</option>
 					))}
 				</select>
 			</div>
@@ -59,7 +63,9 @@ export default function Filters(props: FilterProps) {
 				<select {...register("Epsilon", { required: true })}>
 					{/* for each epsilon, create an option */}
 					{data.epsilons?.map((eps) => (
-						<option key = {eps} value={eps}>{eps}</option>
+						<option key={eps} value={eps}>
+							{eps}
+						</option>
 					))}
 				</select>
 			</div>
@@ -68,13 +74,14 @@ export default function Filters(props: FilterProps) {
 				<select {...register("Number of bins", { required: true })}>
 					{/* for each number of bins, create an option */}
 					{data.numBins?.map((num) => (
-						<option key = {num} value={num}>{num + "x" + num}</option>
+						<option key={num} value={num}>
+							{num + "x" + num}
+						</option>
 					))}
 				</select>
 			</div>
 			<div>
-
-			<input type="submit" />
+				<input type="submit" />
 			</div>
 		</form>
 	);

@@ -50,6 +50,8 @@ function App() {
 
 	const [filterParams, setFilterParams] = React.useState<any>({});
 
+	const [unbinThreshold, setUnbinThreshold] = React.useState<number>(5);
+
 	const handleParamChange = (params: any) => {
 		setOriginalDataName(params.Dataset);
 		setBinningMode(parseInt(params["Number of bins"]) || 32);
@@ -71,7 +73,7 @@ function App() {
 	//fetch original data from server
 	useEffect(() => {
 		if (originalDataName) {
-			collectData();
+			// collectData();
 			console.log("fetching original data");
 			dataService
 				.getDataset("original", originalDataName + ".csv")
@@ -121,6 +123,7 @@ function App() {
 	}, [privUnbinnedData2D]);
 	return (
 		<div className="App">
+			<input ></input>
 			<Filters onSubmit={handleParamChange} data={filterParams}></Filters>
 			<div id="content">
 				<div id="plots">
