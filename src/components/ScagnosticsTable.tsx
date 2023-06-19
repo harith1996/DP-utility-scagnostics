@@ -4,7 +4,7 @@ interface ScagnosticsDisplayProps {
 	scagList: Array<any>;
 }
 
-const scores = [
+const SCORES = [
 	"clumpyScore",
 	"convexScore",
 	"outlyingScore",
@@ -51,7 +51,7 @@ export default function ScagnosticsTable(props: ScagnosticsDisplayProps) {
 	const [rows, setRows] = React.useState<any[]>([]);
 	useEffect(() => {
 		let rows: any[] = [];
-		scores.forEach((score) => {
+		SCORES.forEach((score) => {
 			if (props.scagList[0].hasOwnProperty(score)) {
 				let score1 = props.scagList[0][score];
 				let score2 = props.scagList[1][score];
