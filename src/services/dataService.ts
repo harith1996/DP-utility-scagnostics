@@ -22,7 +22,7 @@ export const getAttributes = async () => {
 //get filter params
 export const getFilterParams = async () => {
 	const response = await fetch(`${HOST}/filterParams`);
-	return await response.json() as string[];
+	return await response.json();
 };
 
 //get unique values of each attribute
