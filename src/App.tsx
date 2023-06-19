@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { parse } from "papaparse";
+import collectData from "./services/dataCollector";
 
 import "./App.css";
 //import libraries
@@ -23,7 +24,7 @@ import { filter } from "d3";
 
 /* eslint-disable-next-line no-restricted-globals */
 function App() {
-	const [originalDataName, setOriginalDataName] = React.useState<string>("");
+	const [originalDataName, setOriginalDataName] = React.useState<string | undefined >(undefined);
 	const [originalData, setOriginalData] = React.useState<Data2D | undefined>(
 		undefined
 	);
@@ -70,6 +71,7 @@ function App() {
 	//fetch original data from server
 	useEffect(() => {
 		if (originalDataName) {
+			collectData();
 			console.log("fetching original data");
 			dataService
 				.getDataset("original", originalDataName + ".csv")
@@ -136,8 +138,7 @@ function App() {
 								unbinned: privUnbinnedData2D,
 								binned: privBinnedData2D,
 								titleUnbinned: "Private Data (Unbinned)",
-								titleBinned:
-									"Private Data (DAWA, bins = 32x32, epsilon=0.5)",
+								titleBinned: `Private Data (Binned)`,
 								xDomain: [
 									originalData?.xMin,
 									originalData?.xMax,
