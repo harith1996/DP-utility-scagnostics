@@ -21,10 +21,13 @@ import Data2D from "./classes/Data2D";
 import * as dataService from "./services/dataService";
 import Filters from "./components/Filters";
 import { filter } from "d3";
+import { Slider } from "@mui/material";
 
 /* eslint-disable-next-line no-restricted-globals */
 function App() {
-	const [originalDataName, setOriginalDataName] = React.useState<string | undefined >(undefined);
+	const [originalDataName, setOriginalDataName] = React.useState<
+		string | undefined
+	>(undefined);
 	const [originalData, setOriginalData] = React.useState<Data2D | undefined>(
 		undefined
 	);
@@ -50,7 +53,17 @@ function App() {
 
 	const [filterParams, setFilterParams] = React.useState<any>({});
 
-	const [unbinThreshold, setUnbinThreshold] = React.useState<number>(5);
+	const [unbinThreshold, setUnbinThreshold] = React.useState<
+		number | number[]
+	>(0);
+
+	const handleUnbinThresholdChange = (
+		event: Event,
+		newValue: number | number[],
+		activeThum: number
+	) => {
+		setUnbinThreshold(newValue);
+	};
 
 	const handleParamChange = (params: any) => {
 		setOriginalDataName(params.Dataset);
@@ -101,11 +114,12 @@ function App() {
 				originalData.xRange,
 				originalData.yRange,
 				originalData.xMin,
-				originalData.yMin
+				originalData.yMin,
+				unbinThreshold as number
 			);
 			setPrivUnbinnedData(unbinnedData);
 		}
-	}, [originalData, privBinnedData2D]);
+	}, [originalData, privBinnedData2D, unbinThreshold]);
 
 	//compute scagnostics
 	useEffect(() => {
@@ -123,8 +137,21 @@ function App() {
 	}, [privUnbinnedData2D]);
 	return (
 		<div className="App">
-			<input ></input>
 			<Filters onSubmit={handleParamChange} data={filterParams}></Filters>
+			<div id="unbin-threshold-slider">
+				<h5>Denoise Level</h5>
+				<Slider
+					aria-label="Temperature"
+					defaultValue={0}
+					step={1}
+					marks
+					min={0}
+					max={10}
+					value={unbinThreshold}
+					valueLabelDisplay="on"
+					onChange={handleUnbinThresholdChange}
+				/>
+			</div>
 			<div id="content">
 				<div id="plots">
 					<Plots
@@ -154,6 +181,7 @@ function App() {
 						]}
 					></Plots>
 				</div>
+
 				<div>
 					<ScagnosticsTable
 						scagList={[ogScagnostics, unbinScagnostics]}
