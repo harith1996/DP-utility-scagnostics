@@ -14,6 +14,7 @@ const SCORES = [
 	"striatedScore",
 	"monotonicScore",
 	"stringyScore",
+	"skewedScore"
 ];
 
 const columns: GridColDef[] = [
