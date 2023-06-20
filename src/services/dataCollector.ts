@@ -13,6 +13,7 @@ const SCORES = [
 	"striatedScore",
 	"monotonicScore",
 	"stringyScore",
+	"skewedScore"
 ];
 
 const extractDataValues = (data: any) => {
