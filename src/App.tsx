@@ -125,14 +125,18 @@ function App() {
 	useEffect(() => {
 		if (originalData) {
 			console.log("computing scagnostics - original");
-			setOGScagnostics(new Scagnostics(originalData.data));
+			const scag = new Scagnostics(originalData.data);
+			console.log(scag);
+			setOGScagnostics(scag);
 		}
 	}, [originalData]);
 
 	useEffect(() => {
 		if (privUnbinnedData2D) {
 			console.log("computing scagnostics - private unbinned");
-			setUnbinScagnostics(new Scagnostics(privUnbinnedData2D.data));
+			const scag = new Scagnostics(privUnbinnedData2D.data);
+			console.log(scag);
+			setUnbinScagnostics(scag);
 		}
 	}, [privUnbinnedData2D]);
 	return (
