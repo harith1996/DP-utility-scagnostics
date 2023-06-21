@@ -8,7 +8,6 @@ const SCORES = [
 	"clumpyScore",
 	"convexScore",
 	"outlyingScore",
-	"outlyingUpperBound",
 	"skinnyScore",
 	"sparseScore",
 	"striatedScore",
@@ -21,16 +20,17 @@ const columns: GridColDef[] = [
 	{ field: "scoreName", headerName: "Scagnostics Measure", width: 200 },
 	{ field: "score1", headerName: "Score (original)", width: 200 },
 	{ field: "score2", headerName: "Score (private)", width: 200 },
+	{ field: "score3", headerName: "Score (private convex hull)", width: 200 },
 	{
-		field: "diff",
+		field: "diff12",
 		headerName: "Difference (private - original)",
 		width: 200,
 	},
 	{
-		field: "diff_perc",
-		headerName: "Difference % (private - original)",
-		width: 200,
-	},
+		field: "diff13",
+		headerName: "Difference (private convex hull - original)",
+		width: 200
+	}
 	// {
 	// 	field: "age",
 	// 	headerName: "Age",
@@ -56,15 +56,17 @@ export default function ScagnosticsTable(props: ScagnosticsDisplayProps) {
 			if (props.scagList[0].hasOwnProperty(score)) {
 				let score1 = props.scagList[0][score];
 				let score2 = props.scagList[1][score];
-				let diff = score2 - score1;
-				let diff_perc = (diff / score1) * 100;
+				let score3 = props.scagList[2][score];
+				let diff12 = score2 - score1;
+				let diff13 = score3 - score1;
 				rows.push({
 					id: score,
 					scoreName: score,
 					score1: score1?.toFixed(6),
 					score2: score2?.toFixed(6),
-					diff: diff?.toFixed(6),
-					diff_perc: diff_perc?.toFixed(6),
+					score3: score3?.toFixed(6),
+					diff12: diff12?.toFixed(6),
+					diff13: diff13?.toFixed(6)
 				});
 			}
 		});
