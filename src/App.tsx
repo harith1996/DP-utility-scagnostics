@@ -22,6 +22,10 @@ import * as dataService from "./services/dataService";
 import Filters from "./components/Filters";
 import { filter } from "d3";
 import { Slider } from "@mui/material";
+import pointInPolygon from "./utilities/pointInPolygon";
+const scagOptions = {
+	binType: "leader",
+};
 
 /* eslint-disable-next-line no-restricted-globals */
 function App() {
@@ -40,10 +44,10 @@ function App() {
 	const [privUnbinnedData2D, setPrivUnbinnedData] = React.useState<
 		Data2D | undefined
 	>(undefined);
-	const [ogScagnostics, setOGScagnostics] = React.useState<Scagnostics>([]);
-	const [unbinScagnostics, setUnbinScagnostics] = React.useState<Scagnostics>(
-		[]
-	);
+	const [ogScagnostics, setOGScagnostics] = React.useState<any>([]);
+	const [unbinScagnostics, setUnbinScagnostics] = React.useState<any>([]);
+	const [unbinConvHullScagnostics, setUnbinConvHullScagnostics] =
+		React.useState<any>([]);
 	const [binningMode, setBinningMode] = React.useState<number>(32);
 	const extractDataValues = (data: any) => {
 		return data.map((d: any) =>
@@ -125,7 +129,7 @@ function App() {
 	useEffect(() => {
 		if (originalData) {
 			console.log("computing scagnostics - original");
-			const scag = new Scagnostics(originalData.data);
+			const scag = new Scagnostics(originalData.data, scagOptions);
 			console.log(scag);
 			setOGScagnostics(scag);
 		}
@@ -134,11 +138,23 @@ function App() {
 	useEffect(() => {
 		if (privUnbinnedData2D) {
 			console.log("computing scagnostics - private unbinned");
-			const scag = new Scagnostics(privUnbinnedData2D.data);
-			console.log(scag);
-			setUnbinScagnostics(scag);
+			//get convex hull of original data
+			const convHull = ogScagnostics["convexHull"];
+			const scagWhole = new Scagnostics(
+				privUnbinnedData2D.data,
+				scagOptions
+			) as any;
+			//filter points outside of convex hull
+			const normalizedPoints = scagWhole.normalizedPoints;
+			const filteredData = normalizedPoints.filter((d: number[]) => {
+				return pointInPolygon(convHull, d);
+			});
+			const scagConvHull = new Scagnostics(filteredData, scagOptions);
+			console.log(scagWhole);
+			setUnbinConvHullScagnostics(scagConvHull);
+			setUnbinScagnostics(scagWhole);
 		}
-	}, [privUnbinnedData2D]);
+	}, [ogScagnostics, privUnbinnedData2D]);
 	return (
 		<div className="App">
 			<Filters onSubmit={handleParamChange} data={filterParams}></Filters>
@@ -188,7 +204,7 @@ function App() {
 
 				<div>
 					<ScagnosticsTable
-						scagList={[ogScagnostics, unbinScagnostics]}
+						scagList={[ogScagnostics, unbinScagnostics, unbinConvHullScagnostics]}
 					></ScagnosticsTable>
 				</div>
 			</div>
