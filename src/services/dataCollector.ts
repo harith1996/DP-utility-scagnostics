@@ -3,6 +3,7 @@ import BinnedData2D from "../classes/BinnedData2D";
 import Data2D from "../classes/Data2D";
 import Scagnostics from "../lib/scagnostics.js";
 import { unparse } from "papaparse";
+import pointInPolygon from "../utilities/pointInPolygon";
 const SCORES = [
 	"clumpyScore",
 	"convexScore",
@@ -63,10 +64,26 @@ export default function collectData() {
 											);
 
 										//compute scagnostics
-										let privScag = new Scagnostics(
+										let scagWhole = new Scagnostics(
 											privateUnbinnedData.data
 										) as any;
 
+										const convHull = ogScag["convexHull"];
+										//filter points outside of convex hull
+										const normalizedPoints =
+											scagWhole.normalizedPoints;
+										const filteredData =
+											normalizedPoints.filter(
+												(d: number[]) => {
+													return pointInPolygon(
+														convHull,
+														d
+													);
+												}
+											);
+										const scagConvHull = new Scagnostics(
+											filteredData
+										) as any;
 										//push data to array
 										const row: { [index: string]: any } =
 											{};
@@ -79,19 +96,46 @@ export default function collectData() {
 										SCORES.forEach((score: string) => {
 											row[score + "_og"] = ogScag[score];
 											row[score + "_priv"] =
-												privScag[score];
-											row[score + "_diff"] = Math.abs(
-												//absolute value of difference
-												ogScag[score] - privScag[score]
-											);
+												scagWhole[score];
+											row[score + "_convHull"] =
+												scagConvHull[score];
+											row[score + "_diff_og_priv"] =
+												Math.abs(
+													//absolute value of difference
+													ogScag[score] -
+														scagWhole[score]
+												);
+											row[score + "_diff_og_convHull"] =
+												Math.abs(
+													//absolute value of difference
+													ogScag[score] -
+														scagConvHull[score]
+												);
 										});
 										//add a column for Euclidean distance between the two scagnostics vectors
-										row["rmsd"] = Math.sqrt(
+										row["rmsd_og_priv"] = Math.sqrt(
 											SCORES.reduce(
 												(acc: number, score: string) =>
 													acc +
 													Math.pow(
-														row[score + "_diff"],
+														row[
+															score +
+																"_diff_og_priv"
+														],
+														2
+													),
+												0
+											)
+										);
+										row["rmsd_og_convHull"] = Math.sqrt(
+											SCORES.reduce(
+												(acc: number, score: string) =>
+													acc +
+													Math.pow(
+														row[
+															score +
+																"_diff_og_convHull"
+														],
 														2
 													),
 												0
