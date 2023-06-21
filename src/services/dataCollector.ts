@@ -7,13 +7,12 @@ const SCORES = [
 	"clumpyScore",
 	"convexScore",
 	"outlyingScore",
-	"outlyingUpperBound",
 	"skinnyScore",
 	"sparseScore",
 	"striatedScore",
 	"monotonicScore",
 	"stringyScore",
-	"skewedScore"
+	"skewedScore",
 ];
 
 const extractDataValues = (data: any) => {
@@ -59,7 +58,8 @@ export default function collectData() {
 												originalData.xRange,
 												originalData.yRange,
 												originalData.xMin,
-												originalData.yMin
+												originalData.yMin,
+												3
 											);
 
 										//compute scagnostics
@@ -80,7 +80,24 @@ export default function collectData() {
 											row[score + "_og"] = ogScag[score];
 											row[score + "_priv"] =
 												privScag[score];
+											row[score + "_diff"] = Math.abs(
+												//absolute value of difference
+												ogScag[score] - privScag[score]
+											);
 										});
+										//add a column for Euclidean distance between the two scagnostics vectors
+										row["rmsd"] = Math.sqrt(
+											SCORES.reduce(
+												(acc: number, score: string) =>
+													acc +
+													Math.pow(
+														row[score + "_diff"],
+														2
+													),
+												0
+											)
+										);
+
 										data.push(row);
 									});
 							});
@@ -90,6 +107,7 @@ export default function collectData() {
 		});
 
 		console.log(data);
+		console.log(unparse(data));
 		return data;
 	});
 }
