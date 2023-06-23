@@ -16,9 +16,7 @@ const SCORES = [
 	"skewedScore",
 ];
 
-const UNBIN = [
-	0,1,2,3
-]
+const UNBIN = [0, 1, 2, 3];
 
 const extractDataValues = (data: any) => {
 	return data.map((d: any) =>
@@ -54,9 +52,11 @@ export default function collectData() {
 											//make a BinnedData2D object from the private data
 											let privateBinnedData =
 												new BinnedData2D(
-													extractDataValues(privateData)
+													extractDataValues(
+														privateData
+													)
 												);
-	
+
 											privateBinnedData.transposeData();
 											//unbin the data
 											let privateUnbinnedData =
@@ -67,13 +67,14 @@ export default function collectData() {
 													originalData.yMin,
 													unbin
 												);
-	
+
 											//compute scagnostics
 											let scagWhole = new Scagnostics(
 												privateUnbinnedData.data
 											) as any;
-	
-											const convHull = ogScag["convexHull"];
+
+											const convHull =
+												ogScag["convexHull"];
 											//filter points outside of convex hull
 											const normalizedPoints =
 												scagWhole.normalizedPoints;
@@ -86,12 +87,14 @@ export default function collectData() {
 														);
 													}
 												);
-											const scagConvHull = new Scagnostics(
-												filteredData
-											) as any;
+											const scagConvHull =
+												new Scagnostics(
+													filteredData
+												) as any;
 											//push data to array
-											const row: { [index: string]: any } =
-												{};
+											const row: {
+												[index: string]: any;
+											} = {};
 											Object.assign(row, {
 												dataset: datasetName,
 												algorithm: algorithm,
@@ -99,7 +102,8 @@ export default function collectData() {
 												numBins: numBins,
 											});
 											SCORES.forEach((score: string) => {
-												row[score + "_og"] = ogScag[score];
+												row[score + "_og"] =
+													ogScag[score];
 												row[score + "_priv"] =
 													scagWhole[score];
 												row[score + "_convHull"] =
@@ -110,17 +114,21 @@ export default function collectData() {
 														ogScag[score] -
 															scagWhole[score]
 													);
-												row[score + "_diff_og_convHull"] =
-													Math.abs(
-														//absolute value of difference
-														ogScag[score] -
-															scagConvHull[score]
-													);
+												row[
+													score + "_diff_og_convHull"
+												] = Math.abs(
+													//absolute value of difference
+													ogScag[score] -
+														scagConvHull[score]
+												);
 											});
 											//add a column for Euclidean distance between the two scagnostics vectors
 											row["rmsd_og_priv"] = Math.sqrt(
 												SCORES.reduce(
-													(acc: number, score: string) =>
+													(
+														acc: number,
+														score: string
+													) =>
 														acc +
 														Math.pow(
 															row[
@@ -134,7 +142,10 @@ export default function collectData() {
 											);
 											row["rmsd_og_convHull"] = Math.sqrt(
 												SCORES.reduce(
-													(acc: number, score: string) =>
+													(
+														acc: number,
+														score: string
+													) =>
 														acc +
 														Math.pow(
 															row[
@@ -147,14 +158,13 @@ export default function collectData() {
 												)
 											);
 											row["unbinThreshold"] = unbin;
-	
+
 											data.push(row);
 										});
 								});
 							});
 						});
 					});
-					
 				});
 		});
 
