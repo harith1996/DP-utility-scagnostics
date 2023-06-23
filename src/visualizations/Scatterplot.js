@@ -37,7 +37,9 @@ export default function Scatterplot(
 		stroke = "currentColor", // stroke color for the dots
 		strokeWidth = 1.5, // stroke width for dots
 		halo = "#fff", // color of label halo
-		haloWidth = 3, // padding around the labels
+		haloWidth = 3, // padding around the labels,
+		drawConvexHull = false,
+		convexHull = [],
 	} = {}
 ) {
 	// Compute values.
@@ -56,7 +58,6 @@ export default function Scatterplot(
 	const xAxis = d3.axisBottom(xScale).ticks(width / 80, xFormat);
 	const yAxis = d3.axisLeft(yScale).ticks(height / 50, yFormat);
 
-	
 	const svg = d3
 		.select(svgNodeSelector)
 		.attr("width", width)
@@ -64,7 +65,6 @@ export default function Scatterplot(
 		.attr("viewBox", [0, 0, width, height])
 		.attr("style", "max-width: 100%; height: auto; height: intrinsic;");
 
-		
 	svg.selectAll("*").remove();
 
 	svg.append("g")
@@ -138,4 +138,22 @@ export default function Scatterplot(
 		.attr("cx", (i) => xScale(X[i]))
 		.attr("cy", (i) => yScale(Y[i]))
 		.attr("r", r);
+
+	if (drawConvexHull) {
+		// Draw polygon from array of data points
+		svg.append("g")
+			.selectAll("polygon")
+			.data([convexHull])
+			.enter()
+			.append("polygon")
+			.attr("points", function (d) {
+				return d
+					.map(function (d) {
+						return [xScale(d[0]), yScale(d[1])].join(",");
+					})
+					.join(" ");
+			})
+			.attr("stroke", "black")
+			.attr("stroke-width", 2);
+	}
 }

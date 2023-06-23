@@ -13,6 +13,7 @@ interface PlotInput {
 	titleBinned: string | undefined;
 	xDomain: Array<number | undefined> | undefined;
 	yDomain: Array<number | undefined> | undefined;
+	convexHull: Array<number[]> | undefined;
 }
 
 interface PlotsProps {
@@ -58,6 +59,8 @@ export default function Plots(props: PlotsProps) {
 								yDomain: [
 									yMin, yMax
 								],
+								drawConvexHull: input.convexHull && input.convexHull.length > 0,
+								convexHull: input.convexHull,
 							},
 							scatterplotSpec
 						)

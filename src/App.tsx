@@ -183,6 +183,7 @@ function App() {
 								titleBinned: "Original Data (Binned)",
 								xDomain: undefined,
 								yDomain: undefined,
+								convexHull: []
 							},
 							{
 								unbinned: privUnbinnedData2D,
@@ -197,6 +198,7 @@ function App() {
 									originalData?.yMin,
 									originalData?.yMax,
 								],
+								convexHull: []
 							},
 						]}
 					></Plots>
