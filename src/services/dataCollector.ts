@@ -16,7 +16,7 @@ const SCORES = [
 	"skewedScore",
 ];
 
-const UNBIN = [0, 1, 2, 3];
+const UNBIN = [0, 1, 2];
 
 const extractDataValues = (data: any) => {
 	return data.map((d: any) =>

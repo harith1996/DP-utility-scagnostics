@@ -90,7 +90,7 @@ function App() {
 	//fetch original data from server
 	useEffect(() => {
 		if (originalDataName) {
-			// collectData();
+			collectData();
 			console.log("fetching original data");
 			dataService
 				.getDataset("original", originalDataName + ".csv")

@@ -13,7 +13,7 @@ const SCORES = [
 	"striatedScore",
 	"monotonicScore",
 	"stringyScore",
-	"skewedScore"
+	"skewedScore",
 ];
 
 const columns: GridColDef[] = [
@@ -29,8 +29,8 @@ const columns: GridColDef[] = [
 	{
 		field: "diff13",
 		headerName: "Difference (private convex hull - original)",
-		width: 200
-	}
+		width: 200,
+	},
 	// {
 	// 	field: "age",
 	// 	headerName: "Age",
@@ -66,7 +66,7 @@ export default function ScagnosticsTable(props: ScagnosticsDisplayProps) {
 					score2: score2?.toFixed(6),
 					score3: score3?.toFixed(6),
 					diff12: diff12?.toFixed(6),
-					diff13: diff13?.toFixed(6)
+					diff13: diff13?.toFixed(6),
 				});
 			}
 		});

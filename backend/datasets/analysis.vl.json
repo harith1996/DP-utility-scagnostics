@@ -13,6 +13,9 @@
                 "extent",
                 "rmsd"
             ]
+        },
+        {
+            "filter": "datum.unbinThreshold == 0 || datum.unbinThreshold == 1 || datum.unbinThreshold == 2 || datum.unbinThreshold == 3 || datum.unbinThreshold == 4"
         }
     ],
     "vconcat": [
@@ -100,7 +103,7 @@
                 },
                 "y": {
                     "aggregate": "mean",
-                    "field": "clumpyScore_og",
+                    "field": "clumpyScore_diff_og_convHull",
                     "type": "quantitative",
                     "scale": {}
                 }
