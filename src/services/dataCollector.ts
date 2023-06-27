@@ -54,7 +54,7 @@ export default function collectData() {
 												new BinnedData2D(
 													extractDataValues(
 														privateData
-													)
+													), undefined
 												);
 
 											privateBinnedData.transposeData();
