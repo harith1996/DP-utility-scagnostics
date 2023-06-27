@@ -74,7 +74,7 @@ function App() {
 		setBinningMode(parseInt(params["Number of bins"]) || 32);
 		dataService.getPrivateData(params).then((data) => {
 			let dataValues = extractDataValues(data).slice(0, -1);
-			const binnedData = new BinnedData2D(dataValues);
+			const binnedData = new BinnedData2D(dataValues, undefined);
 			binnedData.transposeData();
 			setPrivBinnedData2D(binnedData);
 		});
@@ -90,7 +90,7 @@ function App() {
 	//fetch original data from server
 	useEffect(() => {
 		if (originalDataName) {
-			collectData();
+			// collectData();
 			console.log("fetching original data");
 			dataService
 				.getDataset("original", originalDataName + ".csv")
@@ -153,6 +153,7 @@ function App() {
 			console.log(scagWhole);
 			setUnbinConvHullScagnostics(scagConvHull);
 			setUnbinScagnostics(scagWhole);
+			originalData?.denoiseData(1, 32);
 		}
 	}, [ogScagnostics, privUnbinnedData2D]);
 	return (

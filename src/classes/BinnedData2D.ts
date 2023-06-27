@@ -1,10 +1,14 @@
 import Data2D from "./Data2D";
+
+type BinMap = number[][][];
 export default class BinnedData2D {
 	data: number[][];
 	numberOfBins: number;
-	constructor(data: number[][]) {
+	binMap: BinMap;
+	constructor(data: number[][], binMap: BinMap | undefined) {
 		this.data = data;
 		this.numberOfBins = data.length;
+		this.binMap = binMap || [];
 	}
 
 	/**
