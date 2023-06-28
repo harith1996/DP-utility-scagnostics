@@ -16,16 +16,16 @@ export default function BinnedScatterplot(
 		insetRight = inset, // inset the default x-range
 		insetBottom = inset, // inset the default y-range
 		insetLeft = inset, // inset the default x-range
-		width = 330, // outer width, in pixels
-		height = 330, // outer height, in pixels
+		width = 400, // outer width, in pixels
+		height = 400, // outer height, in pixels
 		xType = d3.scaleLinear, // type of x-scale
 		xDomain, // [xmin, xmax]
 		xNumBins,
-		xRange = [marginLeft + insetLeft, width - marginRight - insetRight], // [left, right]
+		xRange = [0, width], // [left, right]
 		yType = d3.scaleLinear, // type of y-scale
 		yDomain, // [ymin, ymax]
 		yNumBins,
-		yRange = [height - marginBottom - insetBottom, marginTop + insetTop], // [bottom, top]
+		yRange = [marginTop, height - marginBottom], // [bottom, top]
 		xLabel, // a label for the x-axis
 		yLabel, // a label for the y-axis
 		xFormat, // a format specifier string for the x-axis
@@ -41,10 +41,8 @@ export default function BinnedScatterplot(
 	const colorScale = d3
 		.scaleSequential(d3.interpolateBlues)
 		.domain([0, 10]);
-	const xScale = xType(xDomain, xRange);
-	const yScale = yType(yDomain, yRange);
-	const xAxis = d3.axisBottom(xScale).ticks(width / 80, xFormat);
-	const yAxis = d3.axisLeft(yScale).ticks(height / 50, yFormat);
+	const xScale = xType([0,xNumBins - 1], xRange);
+	const yScale = yType([0,yNumBins - 1], yRange);
 
 	const svg = d3.select(svgNodeSelector);
 	r = width / xNumBins;
@@ -64,7 +62,7 @@ export default function BinnedScatterplot(
 		.enter()
 		.append("g")
 		.attr("class", "row")
-		.attr("transform", (d, i) => `translate(0,${i * r})`);
+		.attr("transform", (d, i) => `translate(0,${yScale(i)})`);
 
 	let column = row
 		.selectAll(".square")
@@ -74,7 +72,7 @@ export default function BinnedScatterplot(
 		.enter()
 		.append("rect")
 		.attr("class", "square")
-		.attr("x", (d, i) => i * r)
+		.attr("x", (d, i) => xScale(i))
 		.attr("y", 0)
 		.attr("width", r)
 		.attr("height", r)
@@ -82,7 +80,7 @@ export default function BinnedScatterplot(
 
 	plot.attr(
 		"transform",
-		`rotate(-90, ${width / 2}, ${height / 2}) translate(${20},0)`
+		`rotate(-90, ${width / 2}, ${height / 2})`
 	);
 	return { colorScale: colorScale };
 }
