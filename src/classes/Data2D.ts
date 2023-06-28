@@ -88,9 +88,11 @@ export default class Data2D {
 			let yBin = Math.floor((y - yMin) / yBinSize);
 			xBin = xBin > numBinsX - 1 ? numBinsX - 1 : xBin;
 			yBin = yBin > numBinsY - 1 ? numBinsY - 1 : yBin;
-			binnedData[xBin][yBin]++;
-			let dataPointsInBin = binMap[xBin][yBin];
-			dataPointsInBin.push(i);
+			if (xBin > -1 && yBin > -1 && xBin < numBinsX && yBin < numBinsY) {
+				binnedData[xBin][yBin]++;
+				let dataPointsInBin = binMap[xBin][yBin];
+				dataPointsInBin.push(i);
+			}
 		}
 		return new BinnedData2D(binnedData, binMap);
 	}
