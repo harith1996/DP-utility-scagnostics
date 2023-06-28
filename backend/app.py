@@ -40,6 +40,7 @@ for filename in filenames['private']:
 #convert the sets to lists
 for key in unique:
     unique[key] = list(unique[key])
+    unique[key].sort()
 
 #list available attributes
 @app.route('/attributes', methods=['GET'])
