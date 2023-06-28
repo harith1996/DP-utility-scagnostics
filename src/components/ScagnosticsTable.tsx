@@ -18,7 +18,8 @@ const SCORES = [
 
 const columns: GridColDef[] = [
 	{ field: "scoreName", headerName: "Scagnostics Measure", width: 200 },
-	{ field: "score1", headerName: "Score (original)", width: 200 },
+	{ field: "score0", headerName: "Score (original)", width: 200 },
+	{ field: "score1", headerName: "Score (original denoised)", width: 200 },
 	{ field: "score2", headerName: "Score (private)", width: 200 },
 	{ field: "score3", headerName: "Score (private convex hull)", width: 200 },
 	{
@@ -54,6 +55,7 @@ export default function ScagnosticsTable(props: ScagnosticsDisplayProps) {
 		let rows: any[] = [];
 		SCORES.forEach((score) => {
 			if (props.scagList[0].hasOwnProperty(score)) {
+				let score0 = props.scagList[3][score];
 				let score1 = props.scagList[0][score];
 				let score2 = props.scagList[1][score];
 				let score3 = props.scagList[2][score];
@@ -62,6 +64,7 @@ export default function ScagnosticsTable(props: ScagnosticsDisplayProps) {
 				rows.push({
 					id: score,
 					scoreName: score,
+					score0: score0?.toFixed(6),
 					score1: score1?.toFixed(6),
 					score2: score2?.toFixed(6),
 					score3: score3?.toFixed(6),
