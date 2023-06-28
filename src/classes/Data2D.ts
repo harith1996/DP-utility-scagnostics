@@ -98,27 +98,32 @@ export default class Data2D {
 	}
 
 	denoiseData(threshold: number, numBins: number) {
-		let binnedData = this.binData(
-			numBins,
-			numBins,
-			this.xRange,
-			this.yRange,
-			this.xMin,
-			this.yMin
-		);
-		let binMap = binnedData.binMap;
 		let denoisedData: number[][] = [];
-		for (let i = 0; i < numBins; i++) {
-			for (let j = 0; j < numBins; j++) {
-				if (binnedData.data[i][j] > threshold) {
-					let indexes = binMap[i][j];
-					let dataPoints = indexes.map((index: number) => {
-						return this.data[index];
-					});
-					denoisedData = denoisedData.concat(dataPoints);
+		if (threshold === 0) {
+			denoisedData = this.data;
+		} else {
+			let binnedData = this.binData(
+				numBins,
+				numBins,
+				this.xRange,
+				this.yRange,
+				this.xMin,
+				this.yMin
+			);
+			let binMap = binnedData.binMap;
+			for (let i = 0; i < numBins; i++) {
+				for (let j = 0; j < numBins; j++) {
+					if (binnedData.data[i][j] > threshold) {
+						let indexes = binMap[i][j];
+						let dataPoints = indexes.map((index: number) => {
+							return this.data[index];
+						});
+						denoisedData = denoisedData.concat(dataPoints);
+					}
 				}
 			}
 		}
+
 		return denoisedData;
 	}
 }
