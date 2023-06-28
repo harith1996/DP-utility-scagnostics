@@ -32,16 +32,19 @@ function App() {
 	const [originalDataName, setOriginalDataName] = React.useState<
 		string | undefined
 	>(undefined);
-	const [originalData, setOriginalData] = React.useState<Data2D | undefined>(
-		undefined
-	);
-	const [binnedData, setBinnedData] = React.useState<
+	const [originalData, setOriginalData] = React.useState<
+		Data2D | undefined
+	>();
+	const [denoisedOgData, setDenoisedOgData] = React.useState<
+		Data2D | undefined
+	>(undefined);
+	const [binnedOgData, setBinnedOgData] = React.useState<
 		BinnedData2D | undefined
 	>();
-	const [privBinnedData2D, setPrivBinnedData2D] = React.useState<
+	const [binnedPrivData, setBinnedPrivData] = React.useState<
 		BinnedData2D | undefined
 	>(undefined);
-	const [privUnbinnedData2D, setPrivUnbinnedData] = React.useState<
+	const [unbinnedPrivData, setUnbinnedPrivData] = React.useState<
 		Data2D | undefined
 	>(undefined);
 	const [ogScagnostics, setOGScagnostics] = React.useState<any>([]);
@@ -76,7 +79,7 @@ function App() {
 			let dataValues = extractDataValues(data).slice(0, -1);
 			const binnedData = new BinnedData2D(dataValues, undefined);
 			binnedData.transposeData();
-			setPrivBinnedData2D(binnedData);
+			setBinnedPrivData(binnedData);
 		});
 	};
 
@@ -103,59 +106,82 @@ function App() {
 
 	//set binned data from original data
 	useEffect(() => {
-		if (originalData) {
+		if (denoisedOgData && originalData) {
 			console.log("setting binned data");
-			const b = originalData?.binData(binningMode, binningMode);
-			setBinnedData(b);
+			const b = denoisedOgData?.binData(
+				binningMode,
+				binningMode,
+				originalData.xRange,
+				originalData.yRange,
+				originalData.xMin,
+				originalData.yMin
+			);
+			setBinnedOgData(b);
 		}
-	}, [originalData, binningMode]);
+	}, [denoisedOgData, binningMode]);
 
 	//set unbinned data from priv binned data
 	useEffect(() => {
 		console.log("setting unbinned data");
-		if (originalData && privBinnedData2D) {
-			let unbinnedData = privBinnedData2D.getUnbinnedData(
+		if (denoisedOgData && binnedPrivData && originalData) {
+			let unbinnedData = binnedPrivData.getUnbinnedData(
 				originalData.xRange,
 				originalData.yRange,
 				originalData.xMin,
 				originalData.yMin,
 				unbinThreshold as number
 			);
-			setPrivUnbinnedData(unbinnedData);
+			setUnbinnedPrivData(unbinnedData);
 		}
-	}, [originalData, privBinnedData2D, unbinThreshold]);
+	}, [denoisedOgData, binnedPrivData]);
+
+	//denoise data
+	useEffect(() => {
+		if (originalData && binnedPrivData) {
+			let denoised = new Data2D(
+				originalData?.denoiseData(
+					unbinThreshold as number,
+					binnedPrivData?.numberOfBins
+				)
+			);
+			setDenoisedOgData(denoised);
+		}
+	}, [unbinThreshold, originalData]);
 
 	//compute scagnostics
 	useEffect(() => {
-		if (originalData) {
+		if (denoisedOgData) {
 			console.log("computing scagnostics - original");
-			const scag = new Scagnostics(originalData.data, scagOptions);
+			const scag = new Scagnostics(denoisedOgData.data, scagOptions);
 			console.log(scag);
 			setOGScagnostics(scag);
 		}
-	}, [originalData]);
+	}, [denoisedOgData]);
 
 	useEffect(() => {
-		if (privUnbinnedData2D) {
-			console.log("computing scagnostics - private unbinned");
-			//get convex hull of original data
-			const convHull = ogScagnostics["convexHull"];
+		if (unbinnedPrivData) {
+			console.log("computing scagnostics - private unbinned ");
 			const scagWhole = new Scagnostics(
-				privUnbinnedData2D.data,
+				unbinnedPrivData.data,
 				scagOptions
 			) as any;
-			//filter points outside of convex hull
+
+			//get convex hull of original data
+			const convHull = ogScagnostics["convexHull"];
 			const normalizedPoints = scagWhole.normalizedPoints;
+			//filter points outside of convex hull
 			const filteredData = normalizedPoints.filter((d: number[]) => {
 				return pointInPolygon(convHull, d);
 			});
+			console.log(
+				"computing scagnostics - private unbinned convex hull "
+			);
 			const scagConvHull = new Scagnostics(filteredData, scagOptions);
 			console.log(scagWhole);
 			setUnbinConvHullScagnostics(scagConvHull);
 			setUnbinScagnostics(scagWhole);
-			originalData?.denoiseData(1, 32);
 		}
-	}, [ogScagnostics, privUnbinnedData2D]);
+	}, [ogScagnostics, unbinnedPrivData]);
 	return (
 		<div className="App">
 			<Filters onSubmit={handleParamChange} data={filterParams}></Filters>
@@ -178,17 +204,23 @@ function App() {
 					<Plots
 						plotInputs={[
 							{
-								unbinned: originalData,
-								binned: binnedData,
+								unbinned: denoisedOgData,
+								binned: binnedOgData,
 								titleUnbinned: "Original Data",
 								titleBinned: "Original Data (Binned)",
-								xDomain: undefined,
-								yDomain: undefined,
-								convexHull: []
+								xDomain: [
+									originalData?.xMin,
+									originalData?.xMax,
+								],
+								yDomain: [
+									originalData?.yMin,
+									originalData?.yMax,
+								],
+								convexHull: [],
 							},
 							{
-								unbinned: privUnbinnedData2D,
-								binned: privBinnedData2D,
+								unbinned: unbinnedPrivData,
+								binned: binnedPrivData,
 								titleUnbinned: "Private Data (Unbinned)",
 								titleBinned: `Private Data (Binned)`,
 								xDomain: [
@@ -199,7 +231,7 @@ function App() {
 									originalData?.yMin,
 									originalData?.yMax,
 								],
-								convexHull: []
+								convexHull: [],
 							},
 						]}
 					></Plots>
@@ -207,7 +239,11 @@ function App() {
 
 				<div>
 					<ScagnosticsTable
-						scagList={[ogScagnostics, unbinScagnostics, unbinConvHullScagnostics]}
+						scagList={[
+							ogScagnostics,
+							unbinScagnostics,
+							unbinConvHullScagnostics,
+						]}
 					></ScagnosticsTable>
 				</div>
 			</div>
