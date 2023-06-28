@@ -1,13 +1,10 @@
 import React, { useEffect } from "react";
-import { parse } from "papaparse";
-import collectData from "./services/dataCollector";
 
 import "./App.css";
 //import libraries
 import Scagnostics from "./lib/scagnostics.js";
 
 //import components
-import FileUploadSingle from "./components/FileUploadSingle";
 import ScagnosticsTable from "./components/ScagnosticsTable";
 import Plots from "./components/Plots";
 
@@ -20,7 +17,6 @@ import Data2D from "./classes/Data2D";
 //import services
 import * as dataService from "./services/dataService";
 import Filters from "./components/Filters";
-import { filter } from "d3";
 import { Slider } from "@mui/material";
 import pointInPolygon from "./utilities/pointInPolygon";
 const scagOptions = {
@@ -46,7 +42,8 @@ function App() {
 		Data2D | undefined
 	>(undefined);
 	const [ogScagnostics, setOgScagnostics] = React.useState<any>([]);
-	const [denoisedOgScagnostics, setDenoisedOgScagnostics] = React.useState<any>([]);
+	const [denoisedOgScagnostics, setDenoisedOgScagnostics] =
+		React.useState<any>([]);
 	const [privScagnostics, setPrivScagnostics] = React.useState<any>([]);
 	const [privConvHullScagnostics, setPrivConvHullScagnostics] =
 		React.useState<any>([]);
@@ -56,6 +53,8 @@ function App() {
 			Object.values(d).map((v: any) => parseFloat(v))
 		);
 	};
+
+	const [ogDataReady, setOgDataReady] = React.useState<boolean>(false);
 
 	const [filterParams, setFilterParams] = React.useState<any>({});
 
@@ -88,17 +87,20 @@ function App() {
 
 	//fetch private data from server
 	useEffect(() => {
-		dataService.getPrivateData(activeParams).then((data) => {
-			let dataValues = extractDataValues(data).slice(0, -1);
-			const binnedData = new BinnedData2D(dataValues, undefined);
-			binnedData.transposeData();
-			setBinnedPrivData(binnedData);
-		});
-	}, [activeParams]);
+		if (ogDataReady) {
+			dataService.getPrivateData(activeParams).then((data) => {
+				let dataValues = extractDataValues(data).slice(0, -1);
+				const binnedData = new BinnedData2D(dataValues, undefined);
+				binnedData.transposeData();
+				setBinnedPrivData(binnedData);
+			});
+		}
+	}, [activeParams, ogDataReady]);
 
 	//fetch original data from server
 	useEffect(() => {
 		if (originalDataName) {
+			setOgDataReady(false);
 			// collectData();
 			console.log("fetching original data");
 			dataService
@@ -106,6 +108,7 @@ function App() {
 				.then((data) => {
 					let dataValues = extractDataValues(data).slice(0, -1);
 					setOgData(new Data2D(dataValues));
+					console.log("computing scagnostics - original data");
 					setOgScagnostics(new Scagnostics(dataValues, scagOptions));
 				});
 		}
@@ -113,7 +116,7 @@ function App() {
 
 	//set binned data from original data
 	useEffect(() => {
-		if (denoisedOgData && ogData) {
+		if (denoisedOgData && ogData && ogDataReady) {
 			console.log("setting binned data");
 			const b = denoisedOgData?.binData(
 				binningMode,
@@ -125,12 +128,12 @@ function App() {
 			);
 			setBinnedOgData(b);
 		}
-	}, [denoisedOgData, binningMode, ogData]);
+	}, [denoisedOgData, binningMode, ogData, ogDataReady]);
 
 	//set unbinned_priv_data from binned_priv_data
 	useEffect(() => {
 		console.log("setting unbinned data");
-		if (denoisedOgData && binnedPrivData && ogData) {
+		if (binnedPrivData && ogData && ogDataReady) {
 			let unbinnedData = binnedPrivData.getUnbinnedData(
 				ogData.xRange,
 				ogData.yRange,
@@ -140,33 +143,31 @@ function App() {
 			);
 			setUnbinnedPrivData(unbinnedData);
 		}
-	}, [denoisedOgData, binnedPrivData, ogData, unbinThreshold]);
+	}, [binnedPrivData, ogData, unbinThreshold, ogDataReady]);
 
 	//denoise data
 	useEffect(() => {
-		if (ogData && binnedPrivData) {
+		if (ogData && binningMode) {
 			let denoised = new Data2D(
-				ogData?.denoiseData(
-					unbinThreshold as number,
-					binnedPrivData?.numberOfBins
-				)
+				ogData?.denoiseData(unbinThreshold as number, binningMode)
 			);
 			setDenoisedOgData(denoised);
 		}
-	}, [unbinThreshold, ogData, binnedPrivData]);
+	}, [unbinThreshold, ogData, binningMode]);
 
 	//compute scagnostics
 	useEffect(() => {
 		if (denoisedOgData) {
-			console.log("computing scagnostics - original");
+			console.log("computing scagnostics - original denoised");
 			const scag = new Scagnostics(denoisedOgData.data, scagOptions);
 			console.log(scag);
 			setDenoisedOgScagnostics(scag);
+			setOgDataReady(true);
 		}
 	}, [denoisedOgData]);
 
 	useEffect(() => {
-		if (unbinnedPrivData) {
+		if (unbinnedPrivData && ogDataReady) {
 			console.log("computing scagnostics - private unbinned ");
 			const scagWhole = new Scagnostics(
 				unbinnedPrivData.data,
@@ -175,7 +176,7 @@ function App() {
 			console.log(scagWhole);
 
 			//get convex hull of original data
-			const convHull = denoisedOgScagnostics["convexHull"];
+			const convHull = ogScagnostics["convexHull"];
 			const normalizedPoints = scagWhole.normalizedPoints;
 			//filter points outside of convex hull
 			const filteredData = normalizedPoints.filter((d: number[]) => {
@@ -189,7 +190,7 @@ function App() {
 			setPrivConvHullScagnostics(scagConvHull);
 			setPrivScagnostics(scagWhole);
 		}
-	}, [denoisedOgScagnostics, unbinnedPrivData]);
+	}, [ogScagnostics, unbinnedPrivData, ogDataReady]);
 	return (
 		<div className="App">
 			<Filters onSubmit={handleParamChange} data={filterParams}></Filters>
