@@ -72,12 +72,10 @@ export default function Plots(props: PlotsProps) {
 							{
 								svgNodeSelector: `#binnedScatterplot${index}`,
 								xDomain: [
-									input.unbinned.xMin,
-									input.unbinned.xMax,
+									xMin, xMax
 								],
 								yDomain: [
-									input.unbinned.yMin,
-									input.unbinned.yMax,
+									yMin, yMax
 								],
 								xNumBins: input.binned.numberOfBins,
 								yNumBins: input.binned.numberOfBins,
