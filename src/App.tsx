@@ -32,9 +32,7 @@ function App() {
 	const [originalDataName, setOriginalDataName] = React.useState<
 		string | undefined
 	>(undefined);
-	const [originalData, setOriginalData] = React.useState<
-		Data2D | undefined
-	>();
+	const [ogData, setOgData] = React.useState<Data2D | undefined>();
 	const [denoisedOgData, setDenoisedOgData] = React.useState<
 		Data2D | undefined
 	>(undefined);
@@ -47,9 +45,10 @@ function App() {
 	const [unbinnedPrivData, setUnbinnedPrivData] = React.useState<
 		Data2D | undefined
 	>(undefined);
-	const [ogScagnostics, setOGScagnostics] = React.useState<any>([]);
-	const [unbinScagnostics, setUnbinScagnostics] = React.useState<any>([]);
-	const [unbinConvHullScagnostics, setUnbinConvHullScagnostics] =
+	const [ogScagnostics, setOgScagnostics] = React.useState<any>([]);
+	const [denoisedOgScagnostics, setDenoisedOgScagnostics] = React.useState<any>([]);
+	const [privScagnostics, setPrivScagnostics] = React.useState<any>([]);
+	const [privConvHullScagnostics, setPrivConvHullScagnostics] =
 		React.useState<any>([]);
 	const [binningMode, setBinningMode] = React.useState<number>(32);
 	const extractDataValues = (data: any) => {
@@ -64,6 +63,8 @@ function App() {
 		number | number[]
 	>(0);
 
+	const [activeParams, setActiveParams] = React.useState<any>({});
+
 	const handleUnbinThresholdChange = (
 		event: Event,
 		newValue: number | number[],
@@ -75,12 +76,7 @@ function App() {
 	const handleParamChange = (params: any) => {
 		setOriginalDataName(params.Dataset);
 		setBinningMode(parseInt(params["Number of bins"]) || 32);
-		dataService.getPrivateData(params).then((data) => {
-			let dataValues = extractDataValues(data).slice(0, -1);
-			const binnedData = new BinnedData2D(dataValues, undefined);
-			binnedData.transposeData();
-			setBinnedPrivData(binnedData);
-		});
+		setActiveParams(params);
 	};
 
 	//fetch filterParams
@@ -89,6 +85,16 @@ function App() {
 			setFilterParams(params);
 		});
 	}, []);
+
+	//fetch private data from server
+	useEffect(() => {
+		dataService.getPrivateData(activeParams).then((data) => {
+			let dataValues = extractDataValues(data).slice(0, -1);
+			const binnedData = new BinnedData2D(dataValues, undefined);
+			binnedData.transposeData();
+			setBinnedPrivData(binnedData);
+		});
+	}, [activeParams]);
 
 	//fetch original data from server
 	useEffect(() => {
@@ -99,54 +105,55 @@ function App() {
 				.getDataset("original", originalDataName + ".csv")
 				.then((data) => {
 					let dataValues = extractDataValues(data).slice(0, -1);
-					setOriginalData(new Data2D(dataValues));
+					setOgData(new Data2D(dataValues));
+					setOgScagnostics(new Scagnostics(dataValues, scagOptions));
 				});
 		}
 	}, [originalDataName]);
 
 	//set binned data from original data
 	useEffect(() => {
-		if (denoisedOgData && originalData) {
+		if (denoisedOgData && ogData) {
 			console.log("setting binned data");
 			const b = denoisedOgData?.binData(
 				binningMode,
 				binningMode,
-				originalData.xRange,
-				originalData.yRange,
-				originalData.xMin,
-				originalData.yMin
+				ogData.xRange,
+				ogData.yRange,
+				ogData.xMin,
+				ogData.yMin
 			);
 			setBinnedOgData(b);
 		}
-	}, [denoisedOgData, binningMode]);
+	}, [denoisedOgData, binningMode, ogData]);
 
-	//set unbinned data from priv binned data
+	//set unbinned_priv_data from binned_priv_data
 	useEffect(() => {
 		console.log("setting unbinned data");
-		if (denoisedOgData && binnedPrivData && originalData) {
+		if (denoisedOgData && binnedPrivData && ogData) {
 			let unbinnedData = binnedPrivData.getUnbinnedData(
-				originalData.xRange,
-				originalData.yRange,
-				originalData.xMin,
-				originalData.yMin,
+				ogData.xRange,
+				ogData.yRange,
+				ogData.xMin,
+				ogData.yMin,
 				unbinThreshold as number
 			);
 			setUnbinnedPrivData(unbinnedData);
 		}
-	}, [denoisedOgData, binnedPrivData]);
+	}, [denoisedOgData, binnedPrivData, ogData, unbinThreshold]);
 
 	//denoise data
 	useEffect(() => {
-		if (originalData && binnedPrivData) {
+		if (ogData && binnedPrivData) {
 			let denoised = new Data2D(
-				originalData?.denoiseData(
+				ogData?.denoiseData(
 					unbinThreshold as number,
 					binnedPrivData?.numberOfBins
 				)
 			);
 			setDenoisedOgData(denoised);
 		}
-	}, [unbinThreshold, originalData]);
+	}, [unbinThreshold, ogData, binnedPrivData]);
 
 	//compute scagnostics
 	useEffect(() => {
@@ -154,7 +161,7 @@ function App() {
 			console.log("computing scagnostics - original");
 			const scag = new Scagnostics(denoisedOgData.data, scagOptions);
 			console.log(scag);
-			setOGScagnostics(scag);
+			setDenoisedOgScagnostics(scag);
 		}
 	}, [denoisedOgData]);
 
@@ -165,9 +172,10 @@ function App() {
 				unbinnedPrivData.data,
 				scagOptions
 			) as any;
+			console.log(scagWhole);
 
 			//get convex hull of original data
-			const convHull = ogScagnostics["convexHull"];
+			const convHull = denoisedOgScagnostics["convexHull"];
 			const normalizedPoints = scagWhole.normalizedPoints;
 			//filter points outside of convex hull
 			const filteredData = normalizedPoints.filter((d: number[]) => {
@@ -177,11 +185,11 @@ function App() {
 				"computing scagnostics - private unbinned convex hull "
 			);
 			const scagConvHull = new Scagnostics(filteredData, scagOptions);
-			console.log(scagWhole);
-			setUnbinConvHullScagnostics(scagConvHull);
-			setUnbinScagnostics(scagWhole);
+			console.log(scagConvHull);
+			setPrivConvHullScagnostics(scagConvHull);
+			setPrivScagnostics(scagWhole);
 		}
-	}, [ogScagnostics, unbinnedPrivData]);
+	}, [denoisedOgScagnostics, unbinnedPrivData]);
 	return (
 		<div className="App">
 			<Filters onSubmit={handleParamChange} data={filterParams}></Filters>
@@ -208,14 +216,8 @@ function App() {
 								binned: binnedOgData,
 								titleUnbinned: "Original Data",
 								titleBinned: "Original Data (Binned)",
-								xDomain: [
-									originalData?.xMin,
-									originalData?.xMax,
-								],
-								yDomain: [
-									originalData?.yMin,
-									originalData?.yMax,
-								],
+								xDomain: [ogData?.xMin, ogData?.xMax],
+								yDomain: [ogData?.yMin, ogData?.yMax],
 								convexHull: [],
 							},
 							{
@@ -223,14 +225,8 @@ function App() {
 								binned: binnedPrivData,
 								titleUnbinned: "Private Data (Unbinned)",
 								titleBinned: `Private Data (Binned)`,
-								xDomain: [
-									originalData?.xMin,
-									originalData?.xMax,
-								],
-								yDomain: [
-									originalData?.yMin,
-									originalData?.yMax,
-								],
+								xDomain: [ogData?.xMin, ogData?.xMax],
+								yDomain: [ogData?.yMin, ogData?.yMax],
 								convexHull: [],
 							},
 						]}
@@ -240,9 +236,10 @@ function App() {
 				<div>
 					<ScagnosticsTable
 						scagList={[
-							ogScagnostics,
-							unbinScagnostics,
-							unbinConvHullScagnostics,
+							denoisedOgScagnostics,
+							privScagnostics,
+							privConvHullScagnostics,
+							ogScagnostics
 						]}
 					></ScagnosticsTable>
 				</div>
