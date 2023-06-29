@@ -16,7 +16,7 @@ const SCORES = [
 	"skewedScore",
 ];
 
-const UNBIN = [0, 1, 2];
+const UNBIN = [0, 1];
 
 const extractDataValues = (data: any) => {
 	return data.map((d: any) =>
@@ -41,9 +41,16 @@ export default function collectData() {
 					let ogScag = new Scagnostics(originalData.data) as any;
 					//get private dataset
 					UNBIN.forEach((unbin: number) => {
-						params.algorithms.forEach((algorithm: string) => {
-							params.epsilons.forEach((epsilon: number) => {
-								params.numBins.forEach((numBins: number) => {
+						params.numBins.forEach((numBins: number) => {
+							let denoisedData = originalData.denoisedData(
+								unbin,
+								numBins
+							);
+							let ogDenoisedScag = new Scagnostics(
+								denoisedData
+							) as any;
+							params.algorithms.forEach((algorithm: string) => {
+								params.epsilons.forEach((epsilon: number) => {
 									let filename = `${datasetName}_${algorithm}_${epsilon}_${numBins}.csv`;
 									//get private dataset
 									dataService
@@ -54,7 +61,8 @@ export default function collectData() {
 												new BinnedData2D(
 													extractDataValues(
 														privateData
-													), undefined
+													),
+													undefined
 												);
 
 											privateBinnedData.transposeData();
@@ -104,6 +112,8 @@ export default function collectData() {
 											SCORES.forEach((score: string) => {
 												row[score + "_og"] =
 													ogScag[score];
+												row[score + "_og_denoised"] =
+													ogDenoisedScag[score];
 												row[score + "_priv"] =
 													scagWhole[score];
 												row[score + "_convHull"] =
@@ -119,6 +129,22 @@ export default function collectData() {
 												] = Math.abs(
 													//absolute value of difference
 													ogScag[score] -
+														scagConvHull[score]
+												);
+												row[
+													score +
+														"_diff_og_denoised_priv"
+												] = Math.abs(
+													//absolute value of difference
+													ogDenoisedScag[score] -
+														scagWhole[score]
+												);
+												row[
+													score +
+														"_diff_og_denoised_convHull"
+												] = Math.abs(
+													//absolute value of difference
+													ogDenoisedScag[score] -
 														scagConvHull[score]
 												);
 											});
