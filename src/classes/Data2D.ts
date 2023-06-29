@@ -57,27 +57,29 @@ export default class Data2D {
 
 	//bin data into a 2D array
 	binData(
-		numBinsX: number,
-		numBinsY: number,
+		numBinsX: number | string,
+		numBinsY: number | string,
 		xRange: number,
 		yRange: number,
 		xMin: number,
 		yMin: number
 	) {
-		let xBinSize = xRange / numBinsX;
-		let yBinSize = yRange / numBinsY;
+		let nBinsX = parseInt(numBinsX as string);
+		let nBinsY = parseInt(numBinsY as string);
+		let xBinSize = xRange / nBinsX;
+		let yBinSize = yRange / nBinsY;
 		let binnedData: number[][] = [];
 		// initialize a 3d Matrix
-		let binMap: BinMap = Array(numBinsX)
+		let binMap: BinMap = Array(nBinsX)
 			.fill(0)
 			.map(() =>
-				Array(numBinsY)
+				Array(nBinsY)
 					.fill(0)
 					.map(() => [])
 			);
-		for (let i = 0; i < numBinsX; i++) {
+		for (let i = 0; i < nBinsX; i++) {
 			binnedData.push([]);
-			for (let j = 0; j < numBinsY; j++) {
+			for (let j = 0; j < nBinsY; j++) {
 				binnedData[i].push(0);
 			}
 		}
@@ -86,9 +88,9 @@ export default class Data2D {
 			let y = this.data[i][1];
 			let xBin = Math.floor((x - xMin) / xBinSize);
 			let yBin = Math.floor((y - yMin) / yBinSize);
-			xBin = xBin > numBinsX - 1 ? numBinsX - 1 : xBin;
-			yBin = yBin > numBinsY - 1 ? numBinsY - 1 : yBin;
-			if (xBin > -1 && yBin > -1 && xBin < numBinsX && yBin < numBinsY) {
+			xBin = xBin > nBinsX - 1 ? nBinsX - 1 : xBin;
+			yBin = yBin > nBinsY - 1 ? nBinsY - 1 : yBin;
+			if (xBin > -1 && yBin > -1 && xBin < nBinsX && yBin < nBinsY) {
 				binnedData[xBin][yBin]++;
 				let dataPointsInBin = binMap[xBin][yBin];
 				dataPointsInBin.push(i);
@@ -97,7 +99,7 @@ export default class Data2D {
 		return new BinnedData2D(binnedData, binMap);
 	}
 
-	denoiseData(threshold: number, numBins: number) {
+	denoisedData(threshold: number, numBins: number) {
 		let denoisedData: number[][] = [];
 		if (threshold === 0) {
 			denoisedData = this.data;
