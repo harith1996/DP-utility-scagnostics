@@ -7,6 +7,8 @@ import Scagnostics from "./lib/scagnostics.js";
 //import components
 import ScagnosticsTable from "./components/ScagnosticsTable";
 import Plots from "./components/Plots";
+import Filters from "./components/Filters";
+import { Slider } from "@mui/material";
 
 //import classes
 import BinnedData2D from "./classes/BinnedData2D";
@@ -16,9 +18,11 @@ import Data2D from "./classes/Data2D";
 
 //import services
 import * as dataService from "./services/dataService";
-import Filters from "./components/Filters";
-import { Slider } from "@mui/material";
+import collectData from "./services/dataCollector";
+
+//import utilities
 import pointInPolygon from "./utilities/pointInPolygon";
+
 const scagOptions = {
 	binType: "leader",
 };
@@ -149,7 +153,7 @@ function App() {
 	useEffect(() => {
 		if (ogData && binningMode) {
 			let denoised = new Data2D(
-				ogData?.denoiseData(unbinThreshold as number, binningMode)
+				ogData?.denoisedData(unbinThreshold as number, binningMode)
 			);
 			setDenoisedOgData(denoised);
 		}
@@ -240,7 +244,7 @@ function App() {
 							denoisedOgScagnostics,
 							privScagnostics,
 							privConvHullScagnostics,
-							ogScagnostics
+							ogScagnostics,
 						]}
 					></ScagnosticsTable>
 				</div>
