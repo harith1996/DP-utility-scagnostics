@@ -1,17 +1,26 @@
 {
     "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
     "data": {
-        "url": "./collected_data_denoised=0,1,2,3,4_date=23_06.csv"
+        "url": "./collected_data_new_datasets_date=29_06.csv"
     },
     "transform": [
         {
             "fold": [
-                "rmsd_og_priv",
-                "rmsd_og_convHull"
+                "rmsd_og_denoised_priv",
+                "rmsd_og_denoised_convHull"
             ],
             "as": [
                 "extent",
                 "rmsd"
+            ]
+        },{
+            "fold": [
+                "clumpyScore_diff_og_priv",
+                "clumpyScore_og_denoised_priv"
+            ],
+            "as": [
+                "noise_state",
+                "clumpyScore_diff"
             ]
         },
         {
@@ -31,25 +40,22 @@
                     "type": "ordinal"
                 },
                 "y": {
-                    "aggregate": "mean",
-                    "field": "rmsd",
+                    "aggregate": "variance",
+                    "field": "clumpyScore_diff",
                     "type": "quantitative",
                     "scale": {
                         "domain": [
                             0,
-                            1
+                            0.5
                         ]
                     }
-                },
-                "xOffset": {
-                    "field": "algorithm"
                 },
                 "color": {
                     "field": "algorithm",
                     "type": "nominal"
                 },
                 "strokeDash": {
-                    "field": "extent",
+                    "field": "noise_state",
                     "type": "nominal"
                 }
             }
@@ -68,7 +74,7 @@
                 },
                 "y": {
                     "aggregate": "mean",
-                    "field": "rmsd",
+                    "field": "clumpyScore_diff",
                     "type": "quantitative",
                     "scale": {
                         "domain": [
@@ -77,15 +83,12 @@
                         ]
                     }
                 },
-                "xOffset": {
-                    "field": "algorithm"
-                },
                 "color": {
                     "field": "algorithm",
                     "type": "nominal"
                 },
                 "strokeDash": {
-                    "field": "extent",
+                    "field": "noise_state",
                     "type": "nominal"
                 }
             }
