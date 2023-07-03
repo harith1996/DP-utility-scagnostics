@@ -59,6 +59,7 @@
                 "y": {
                     "aggregate": "mean",
                     "field": "rmsd",
+                    "title": "Root Mean Squared Distance (avg)",
                     "type": "quantitative",
                     "scale": {
                         "domain": [
@@ -93,6 +94,7 @@
                 "y": {
                     "aggregate": "mean",
                     "field": "rmsd",
+                    "title": "Root Mean Squared Distance (avg)",
                     "type": "quantitative",
                     "scale": {
                         "domain": [
@@ -111,7 +113,8 @@
             "height": 400,
             "width": 500,
             "mark": {
-                "type": "bar"
+                "type": "bar",
+                "color": "red"
             },
             "encoding": {
                 "x": {
@@ -121,15 +124,22 @@
                 "y": {
                     "aggregate": "mean",
                     "field": "rmsd",
+                    "title": "Root Mean Squared Distance (avg)",
                     "type": "quantitative",
-                    "scale": {}
+                    "scale": {
+                        "domain": [
+                            0,
+                            1
+                        ]
+                    }
                 },
                 "xOffset": {
                     "field": "unbinThreshold"
                 },
                 "opacity": {
                     "field": "unbinThreshold",
-                    "type": "nominal"
+                    "type": "nominal",
+                    "title": "Denoised?"
                 },
                 "tooltip": [
                     {

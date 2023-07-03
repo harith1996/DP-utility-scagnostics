@@ -120,12 +120,17 @@
                     "aggregate": "mean",
                     "field": "monotonicScore",
                     "type": "quantitative",
-                    "scale": {}
+                    "scale": {
+                        "domain": [
+                            0,
+                            1
+                        ]
+                    }
                 },
                 "xOffset": {
                     "field": "noise_state_og"
                 },
-                "color": {
+                "opacity": {
                     "field": "noise_state_og",
                     "type": "nominal"
                 },
