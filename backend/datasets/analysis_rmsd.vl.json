@@ -1,0 +1,142 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "data": {
+        "url": "collected_data_new_datasets_date=29_06.csv"
+    },
+    "transform": [
+        {
+            "fold": [
+                "rmsd_og_priv",
+                "rmsd_og_convHull"
+            ],
+            "as": [
+                "extent",
+                "rmsd"
+            ]
+        },
+        {
+            "fold": [
+                "stringyScore_diff_og_priv",
+                "stringyScore_diff_og_denoised_priv"
+            ],
+            "as": [
+                "noise_state",
+                "stringyScore_diff"
+            ]
+        },
+        {
+            "fold": [
+                "stringyScore_og",
+                "stringyScore_og_denoised"
+            ],
+            "as": [
+                "noise_state_og",
+                "stringyScore"
+            ]
+        },
+        {
+            "calculate": "'images/' + datum.dataset + '.png'",
+            "as": "image"
+        },
+        {
+            "calculate": "'https://raw.githubusercontent.com/harith1996/dp-utility-scagnostics/dev/backend/datasets/images/' + datum.dataset + '.png'",
+            "as": "image"
+        }
+    ],
+    "vconcat": [
+        {
+            "height": 400,
+            "width": 500,
+            "mark": {
+                "type": "line",
+                "tooltip": true
+            },
+            "encoding": {
+                "x": {
+                    "field": "epsilon",
+                    "type": "ordinal"
+                },
+                "y": {
+                    "aggregate": "mean",
+                    "field": "rmsd",
+                    "type": "quantitative",
+                    "scale": {
+                        "domain": [
+                            0,
+                            1
+                        ]
+                    }
+                },
+                "color": {
+                    "field": "algorithm",
+                    "type": "nominal"
+                },
+                "strokeDash": {
+                    "field": "unbinThreshold",
+                    "type": "nominal",
+                    "title": "Denoised?"
+                }
+            }
+        },
+        {
+            "height": 400,
+            "width": 500,
+            "mark": {
+                "type": "line"
+            },
+            "encoding": {
+                "x": {
+                    "field": "unbinThreshold",
+                    "title": "Denoise Level",
+                    "type": "nominal"
+                },
+                "y": {
+                    "aggregate": "mean",
+                    "field": "rmsd",
+                    "type": "quantitative",
+                    "scale": {
+                        "domain": [
+                            0,
+                            1
+                        ]
+                    }
+                },
+                "color": {
+                    "field": "algorithm",
+                    "type": "nominal"
+                }
+            }
+        },
+        {
+            "height": 400,
+            "width": 500,
+            "mark": {
+                "type": "bar"
+            },
+            "encoding": {
+                "x": {
+                    "field": "dataset",
+                    "type": "nominal"
+                },
+                "y": {
+                    "aggregate": "mean",
+                    "field": "rmsd",
+                    "type": "quantitative",
+                    "scale": {}
+                },
+                "xOffset": {
+                    "field": "unbinThreshold"
+                },
+                "opacity": {
+                    "field": "unbinThreshold",
+                    "type": "nominal"
+                },
+                "tooltip": [
+                    {
+                        "field": "image"
+                    }
+                ]
+            }
+        }
+    ]
+}

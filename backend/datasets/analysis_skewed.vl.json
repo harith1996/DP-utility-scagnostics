@@ -1,0 +1,140 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "data": {
+        "url": "https://raw.githubusercontent.com/harith1996/dp-utility-scagnostics/dev/backend/datasets/collected_data_new_datasets_date%3D29_06.csv"
+    },
+    "transform": [
+        {
+            "fold": [
+                "rmsd_og_denoised_priv",
+                "rmsd_og_denoised_convHull"
+            ],
+            "as": [
+                "extent",
+                "rmsd"
+            ]
+        },
+        {
+            "fold": [
+                "skewedScore_diff_og_priv",
+                "skewedScore_diff_og_denoised_priv"
+            ],
+            "as": [
+                "noise_state",
+                "skewedScore_diff"
+            ]
+        },
+        {
+            "fold": [
+                "skewedScore_og",
+                "skewedScore_og_denoised"
+            ],
+            "as": [
+                "noise_state_og",
+                "skewedScore"
+            ]
+        },
+        {
+            "calculate": "'https://raw.githubusercontent.com/harith1996/dp-utility-scagnostics/dev/backend/datasets/images/' + datum.dataset + '.png'",
+            "as": "image"
+        }
+    ],
+    "vconcat": [
+        {
+          "transform": [{
+            "filter": "datum.unbinThreshold == 1"
+        }],
+            "height": 400,
+            "width": 500,
+            "mark": {
+                "type": "line",
+                "tooltip": true
+            },
+            "encoding": {
+                "x": {
+                    "field": "epsilon",
+                    "type": "ordinal"
+                },
+                "y": {
+                    "aggregate": "mean",
+                    "field": "skewedScore_diff",
+                    "type": "quantitative",
+                    "scale": {
+                        "domain": [
+                            0,
+                            1
+                        ]
+                    }
+                },
+                "color": {
+                    "field": "algorithm",
+                    "type": "nominal"
+                },
+                "strokeDash": {
+                    "field": "noise_state",
+                    "type": "nominal"
+                }
+            }
+        },
+        {
+            "height": 400,
+            "width": 500,
+            "mark": {
+                "type": "line"
+            },
+            "encoding": {
+                "x": {
+                    "field": "unbinThreshold",
+                    "title": "Denoise Level",
+                    "type": "nominal"
+                },
+                "y": {
+                    "aggregate": "mean",
+                    "field": "skewedScore_diff_og_denoised_priv",
+                    "type": "quantitative",
+                    "scale": {
+                        "domain": [
+                            0,
+                            1
+                        ]
+                    }
+                },
+                "color": {
+                    "field": "algorithm",
+                    "type": "nominal"
+                }
+            }
+        },
+        {
+            "height": 400,
+            "width": 500,
+            "mark": {
+                "type": "bar"
+            },
+            "encoding": {
+                "x": {
+                    "field": "dataset",
+                    "type": "nominal"
+                },
+                "y": {
+                    "aggregate": "mean",
+                    "field": "skewedScore",
+                    "type": "quantitative",
+                    "scale": {}
+                },
+                "xOffset": {
+                    "field": "noise_state_og"
+                },
+                "color": {
+                    "field": "noise_state_og",
+                    "type": "nominal"
+                },
+                "tooltip": [
+                    {
+                        "field": "image"
+                    }
+                ]
+            }
+        }
+    ]
+}
