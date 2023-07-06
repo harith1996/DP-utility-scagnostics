@@ -18,7 +18,7 @@ import Data2D from "./classes/Data2D";
 
 //import services
 import * as dataService from "./services/dataService";
-import collectData from "./services/dataCollector";
+import {collectData, collectCSV} from "./services/dataCollector";
 
 //import utilities
 import pointInPolygon from "./utilities/pointInPolygon";
@@ -105,7 +105,7 @@ function App() {
 	useEffect(() => {
 		if (originalDataName) {
 			setOgDataReady(false);
-			// collectData();
+			collectCSV();
 			console.log("fetching original data");
 			dataService
 				.getDataset("original", originalDataName + ".csv")
@@ -146,6 +146,7 @@ function App() {
 				unbinThreshold as number
 			);
 			setUnbinnedPrivData(unbinnedData);
+			console.log(unbinnedData);
 		}
 	}, [binnedPrivData, ogData, unbinThreshold, ogDataReady]);
 

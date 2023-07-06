@@ -24,7 +24,50 @@ const extractDataValues = (data: any) => {
 	);
 };
 
-export default function collectData() {
+export function collectCSV() {
+	let output = {
+		ogData: [] as any,
+		denoisedData: [] as any,
+	};
+	return dataService.getFilterParams().then((params) => {
+		params.datasetNames.forEach((datasetName: string) => {
+			//get original dataset
+			dataService
+				.getDataset("original", datasetName + ".csv")
+				.then((original) => {
+					//construct Data2D object from original data
+					let originalData = new Data2D(
+						extractDataValues(original).slice(0, -1)
+					);
+					output.ogData.push({
+						name: datasetName,
+						data: originalData.data,
+					});
+					//get private dataset
+					UNBIN.forEach((unbin: number) => {
+						params.numBins.forEach((numBins: number) => {
+							let denoisedData = originalData.denoisedData(
+								unbin,
+								numBins
+							);
+							if(unbin > 0){
+								output.denoisedData.push({
+									unbin: unbin,
+									numBins: numBins,
+									ogDataIndex: datasetName,
+									denoisedData: denoisedData,
+								});
+							}
+							
+						});
+					});
+				});
+		});
+		console.log(output);
+	});
+}
+
+export function collectData() {
 	let data = [] as any[];
 	//get filter params
 	return dataService.getFilterParams().then((params) => {
