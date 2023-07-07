@@ -1,15 +1,15 @@
-// import * as dataService from "./dataService";
-// import BinnedData2D from "../classes/BinnedData2D";
-// import Data2D from "../classes/Data2D";
-// import Scagnostics from "../lib/scagnostics.js";
-// import { unparse } from "papaparse";
-// import pointInPolygon from "../utilities/pointInPolygon";
-const dataService = require("./dataService");
-const BinnedData2D = require("../classes/BinnedData2D");
-const Data2D = require("../classes/Data2D");
-const Scagnostics = require("../lib/scagnostics.js");
-const { unparse } = require("papaparse");
-const pointInPolygon = require("../utilities/pointInPolygon");
+import * as dataService from "./dataService";
+import BinnedData2D from "../classes/BinnedData2D";
+import Data2D from "../classes/Data2D";
+import Scagnostics from "../lib/scagnostics.js";
+import { unparse } from "papaparse";
+import pointInPolygon from "../utilities/pointInPolygon";
+// const dataService = require("./dataService");
+// const BinnedData2D = require("../classes/BinnedData2D");
+// const Data2D = require("../classes/Data2D");
+// const Scagnostics = require("../lib/scagnostics.js");
+// const { unparse } = require("papaparse");
+// const pointInPolygon = require("../utilities/pointInPolygon");
 const SCORES = [
 	"clumpyScore",
 	// "convexScore", //too sensitive to outliers
@@ -37,8 +37,27 @@ export function collectCSV() {
 		privateDataUnbinned: [] as any,
 	};
 	return dataService.getFilterParams().then((params: any) => {
+		let count =
+			params.datasetNames.length *
+			params.numBins.length *
+			params.algorithms.length *
+			params.epsilons.length *
+			UNBIN.length;
+		let progress = 0;
+		let promiseResolve: (arg0: {
+				ogData: any;
+				denoisedData: any;
+				privateDataUnbinned: any;
+			}) => void,
+			promiseReject;
+
+		let finishPromise = new Promise(function (resolve, reject) {
+			promiseResolve = resolve;
+			promiseReject = reject;
+		});
 		params.datasetNames.forEach((datasetName: string) => {
 			//get original dataset
+
 			dataService
 				.getDataset("original", datasetName + ".csv")
 				.then((original: any) => {
@@ -97,8 +116,12 @@ export function collectCSV() {
 												algorithm: algorithm,
 												epsilon: epsilon,
 												ogDataIndex: datasetName,
-												data: privateUnbinnedData,
+												data: privateUnbinnedData.data,
 											});
+											progress++;
+											if (progress === count) {
+												promiseResolve(output);
+											}
 										});
 								});
 							});
@@ -106,7 +129,7 @@ export function collectCSV() {
 					});
 				});
 		});
-		console.log(output);
+		return finishPromise;
 	});
 }
 
@@ -285,5 +308,3 @@ export function collectData() {
 		return data;
 	});
 }
-
-collectCSV();
