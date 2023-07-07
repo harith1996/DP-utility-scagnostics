@@ -1,9 +1,15 @@
-import * as dataService from "./dataService";
-import BinnedData2D from "../classes/BinnedData2D";
-import Data2D from "../classes/Data2D";
-import Scagnostics from "../lib/scagnostics.js";
-import { unparse } from "papaparse";
-import pointInPolygon from "../utilities/pointInPolygon";
+// import * as dataService from "./dataService";
+// import BinnedData2D from "../classes/BinnedData2D";
+// import Data2D from "../classes/Data2D";
+// import Scagnostics from "../lib/scagnostics.js";
+// import { unparse } from "papaparse";
+// import pointInPolygon from "../utilities/pointInPolygon";
+const dataService = require("./dataService");
+const BinnedData2D = require("../classes/BinnedData2D");
+const Data2D = require("../classes/Data2D");
+const Scagnostics = require("../lib/scagnostics.js");
+const { unparse } = require("papaparse");
+const pointInPolygon = require("../utilities/pointInPolygon");
 const SCORES = [
 	"clumpyScore",
 	// "convexScore", //too sensitive to outliers
@@ -28,19 +34,20 @@ export function collectCSV() {
 	let output = {
 		ogData: [] as any,
 		denoisedData: [] as any,
+		privateDataUnbinned: [] as any,
 	};
-	return dataService.getFilterParams().then((params) => {
+	return dataService.getFilterParams().then((params: any) => {
 		params.datasetNames.forEach((datasetName: string) => {
 			//get original dataset
 			dataService
 				.getDataset("original", datasetName + ".csv")
-				.then((original) => {
+				.then((original: any) => {
 					//construct Data2D object from original data
 					let originalData = new Data2D(
 						extractDataValues(original).slice(0, -1)
 					);
 					output.ogData.push({
-						name: datasetName,
+						ogDataIndex: datasetName,
 						data: originalData.data,
 					});
 					//get private dataset
@@ -50,15 +57,51 @@ export function collectCSV() {
 								unbin,
 								numBins
 							);
-							if(unbin > 0){
+							if (unbin > 0) {
 								output.denoisedData.push({
 									unbin: unbin,
 									numBins: numBins,
 									ogDataIndex: datasetName,
-									denoisedData: denoisedData,
+									data: denoisedData,
 								});
 							}
-							
+							params.algorithms.forEach((algorithm: string) => {
+								params.epsilons.forEach((epsilon: number) => {
+									let filename = `${datasetName}_${algorithm}_${epsilon}_${numBins}.csv`;
+									//get private dataset
+									dataService
+										.getDataset("private", filename)
+										.then((privateData: any) => {
+											//make a BinnedData2D object from the private data
+											let privateBinnedData =
+												new BinnedData2D(
+													extractDataValues(
+														privateData
+													),
+													undefined
+												);
+
+											privateBinnedData.transposeData();
+											//unbin the data
+											let privateUnbinnedData =
+												privateBinnedData.getUnbinnedData(
+													originalData.xRange,
+													originalData.yRange,
+													originalData.xMin,
+													originalData.yMin,
+													unbin
+												);
+											output.privateDataUnbinned.push({
+												unbin: unbin,
+												numBins: numBins,
+												algorithm: algorithm,
+												epsilon: epsilon,
+												ogDataIndex: datasetName,
+												data: privateUnbinnedData,
+											});
+										});
+								});
+							});
 						});
 					});
 				});
@@ -70,12 +113,12 @@ export function collectCSV() {
 export function collectData() {
 	let data = [] as any[];
 	//get filter params
-	return dataService.getFilterParams().then((params) => {
+	return dataService.getFilterParams().then((params: any) => {
 		params.datasetNames.forEach((datasetName: string) => {
 			//get original dataset
 			dataService
 				.getDataset("original", datasetName + ".csv")
-				.then((original) => {
+				.then((original: any) => {
 					//construct Data2D object from original data
 					let originalData = new Data2D(
 						extractDataValues(original).slice(0, -1)
@@ -98,7 +141,7 @@ export function collectData() {
 									//get private dataset
 									dataService
 										.getDataset("private", filename)
-										.then((privateData) => {
+										.then((privateData: any) => {
 											//make a BinnedData2D object from the private data
 											let privateBinnedData =
 												new BinnedData2D(
@@ -242,3 +285,5 @@ export function collectData() {
 		return data;
 	});
 }
+
+collectCSV();
