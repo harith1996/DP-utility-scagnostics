@@ -18,7 +18,6 @@ for dataType in ['original', 'private']:
 
 unique = {
     'datasetNames': set(),
-    'features': set(),
     'algorithms': set(),
     'epsilons': set(),
     'numBins': set()
@@ -31,13 +30,17 @@ def parse_private_filename(filename):
     filename = filename.split('_')
     #Push unique values to the lists
     unique['datasetNames'].add(filename[0])
-    unique['features'].add(filename[1])
-    unique['algorithms'].add(filename[2])
-    unique['epsilons'].add(filename[3])
-    unique['numBins'].add(filename[4])
+    unique['algorithms'].add(filename[1])
+    unique['epsilons'].add(filename[2])
+    unique['numBins'].add(filename[3])
 
 for filename in filenames['private']:
     parse_private_filename(filename)
+
+#convert the sets to lists
+for key in unique:
+    unique[key] = list(unique[key])
+    unique[key].sort()
 
 #list available attributes
 @app.route('/attributes', methods=['GET'])
@@ -45,8 +48,14 @@ for filename in filenames['private']:
 def list_attributes():
     return jsonify(list(unique.keys()))
 
+#list unique values of all attributes
+@app.route('/filterParams', methods=['GET'])
+@cross_origin()
+def filter_params():
+    return jsonify(unique)
+
 #list unqiue values
-@app.route('/attributes/unique/<attribute>', methods=['GET'])
+@app.route('/attributes/<attribute>/unique', methods=['GET'])
 @cross_origin()
 def list_unique(attribute):
     return jsonify(list(unique[attribute]))
@@ -64,7 +73,10 @@ def get_data(dataType, filename):
     data = []
     path = ROOT_PATH + 'datasets/' + dataType + '/'  + filename
     with open(path, 'r') as file:
-        csv_reader = csv.DictReader(file)
+        if(dataType == 'private'):
+            csv_reader = csv.reader(file)
+        else:
+            csv_reader = csv.DictReader(file)
         for row in csv_reader:
             data.append(row)
     return jsonify(data)

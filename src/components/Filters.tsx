@@ -1,47 +1,88 @@
 import React from "react";
-import {
-	Slider,
-	Select,
-	MenuItem,
-	FormControl,
-	InputLabel,
-	SelectChangeEvent,
-} from "@mui/material";
+import { useForm } from "react-hook-form";
 
-interface DPFilterProps {
-	datasetNames: string[];
-	epsilons: number[];
-	algorithms: string[];
-	numNumBins: number[];
-	features: string[];
+interface FilterProps {
+	onSubmit: (data: any) => void;
+	data: DPParamUniqueValues;
 }
 
-export default function Filters(props: DPFilterProps) {
-	const [epsilon, setEpsilon] = React.useState<number>(0.1);
-	const [algorithm, setAlgorithm] = React.useState<string>("Histogram");
-	const [numNumBin, setNumNumBin] = React.useState<number>(10);
-	const [feature, setFeature] = React.useState<string>("distribution");
-	const [datasetName, setDatasetName] = React.useState<string>("0");
-	const handleChange = (event: SelectChangeEvent<{ value: any }>) => {
-		console.log(event.target.value);
+interface DPParams {
+	Dataset: string;
+	Algorithm: string;
+	Epsilon: string;
+	NumberOfBins: string;
+}
+
+interface DPParamUniqueValues {
+	datasetNames: string[];
+	algorithms: string[];
+	epsilons: string[];
+	numBins: string[];
+}
+
+export default function Filters(props: FilterProps) {
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+	} = useForm();
+	const onSubmit = (data: any) => {
+		console.log(data);
+		props.onSubmit(data as DPParams);
 	};
+
+	const data = props.data;
+
 	return (
-		<div>
-			<FormControl fullWidth>
-				<InputLabel id="demo-simple-select-label">Age</InputLabel>
-				<Select
-					labelId="demo-simple-select-label"
-					id="demo-simple-select"
-					value={""}
-					label="Age"
-					onChange={handleChange}
-				>
-					{/* Create a MenuItem for each datasetName */}
-					{props.datasetNames.map((datasetName) => (
-						<MenuItem value={datasetName}>{datasetName}</MenuItem>
+		<form className="filter-form" onSubmit={handleSubmit(onSubmit)}>
+			<div>
+				<label htmlFor="Dataset">Dataset</label>
+				<select {...register("Dataset", { required: true })}>
+					{/* for each dataset, create an option */}
+					{data.datasetNames?.map((dataset) => (
+						<option key={dataset} value={dataset}>
+							{dataset}
+						</option>
 					))}
-				</Select>
-			</FormControl>
-		</div>
+				</select>
+			</div>
+
+			<div>
+				<label>Algorithm</label>
+				<select {...register("Algorithm", { required: true })}>
+					{/* for each algorithm, create an option */}
+					{data.algorithms?.map((algo) => (
+						<option key={algo} value={algo}>
+							{algo}
+						</option>
+					))}
+				</select>
+			</div>
+			<div>
+				<label>Epsilon</label>
+				<select {...register("Epsilon", { required: true })}>
+					{/* for each epsilon, create an option */}
+					{data.epsilons?.map((eps) => (
+						<option key={eps} value={eps}>
+							{eps}
+						</option>
+					))}
+				</select>
+			</div>
+			<div>
+				<label>Number of bins</label>
+				<select {...register("Number of bins", { required: true })}>
+					{/* for each number of bins, create an option */}
+					{data.numBins?.map((num) => (
+						<option key={num} value={num}>
+							{num + "x" + num}
+						</option>
+					))}
+				</select>
+			</div>
+			<div>
+				<input type="submit" />
+			</div>
+		</form>
 	);
 }

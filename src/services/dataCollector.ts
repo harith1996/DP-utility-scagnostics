@@ -108,8 +108,7 @@ export function collectCSV() {
 													originalData.yRange,
 													originalData.xMin,
 													originalData.yMin,
-													unbin,
-													originalData.data.length
+													unbin
 												);
 											output.privateDataUnbinned.push({
 												unbin: unbin,
