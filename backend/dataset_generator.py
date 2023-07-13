@@ -24,14 +24,14 @@ def export_data_to_csv(filename, X, Y):
 def gen_clusters(numPoints=4000,n=2, add_outliers=False):    
     plt.subplot(325)
     plt.title(" blobs", fontsize="small")
-    X1, Y1 = make_blobs(n_samples=[500, 1000, 2500], n_features=2, cluster_std=
-                    2.0)
+    X1, Y1 = make_blobs(n_samples=[1500, 2500], n_features=2, cluster_std=
+                    1.5, centers=[[0,0],[10,10]])
     if(add_outliers):
-        X2, Y2 = make_blobs(n_samples=[34,50,35,30], n_features=2, cluster_std=3.0)
+        X2, Y2 = make_blobs(n_samples=[34,50,35,30], centers=([5,5],[5,5],[5,5],[5,5]), n_features=2, cluster_std=5.0)
         X1 = np.concatenate([X1, X2])
         Y1 = np.concatenate([Y1, Y2])
     plt.scatter(X1[:, 0], X1[:, 1], marker="o", c=Y1, s=25, edgecolor="k")
-    export_data_to_csv("clusters_3", X1[:, 0], X1[:, 1])
+    export_data_to_csv("clusters_2", X1[:, 0], X1[:, 1])
 
 
 def gen_correlation(sample_size=4000,slope=100, intercept=50):
