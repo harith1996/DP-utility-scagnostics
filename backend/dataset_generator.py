@@ -25,9 +25,9 @@ def gen_clusters(numPoints=4000,n=2, add_outliers=False):
     plt.subplot(325)
     plt.title(" blobs", fontsize="small")
     X1, Y1 = make_blobs(n_samples=[1500, 2500], n_features=2, cluster_std=
-                    1.5, centers=[[0,0],[10,10]])
+                    4.5, centers=[[0,0],[40,40]])
     if(add_outliers):
-        X2, Y2 = make_blobs(n_samples=[34,50,35,30], centers=([5,5],[5,5],[5,5],[5,5]), n_features=2, cluster_std=5.0)
+        X2, Y2 = make_blobs(n_samples=[14,40,25,10], centers=([15,20],[25,20],[20,15],[20,25]), n_features=2, cluster_std=10.0)
         X1 = np.concatenate([X1, X2])
         Y1 = np.concatenate([Y1, Y2])
     plt.scatter(X1[:, 0], X1[:, 1], marker="o", c=Y1, s=25, edgecolor="k")
