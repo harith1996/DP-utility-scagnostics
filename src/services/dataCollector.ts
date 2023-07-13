@@ -37,6 +37,7 @@ export function collectCSV() {
 		privateDataUnbinned: [] as any,
 	};
 	return dataService.getFilterParams().then((params: any) => {
+		params.datasetNames = ["1"];
 		let count =
 			params.datasetNames.length *
 			params.numBins.length *

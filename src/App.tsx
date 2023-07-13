@@ -105,19 +105,19 @@ function App() {
 	useEffect(() => {
 		if (originalDataName) {
 			setOgDataReady(false);
-			// collectCSV().then((data) => {
-			// 	//Save as JSON file
-			// 	const json = JSON.stringify(data);
-			// 	const blob = new Blob([json], { type: "application/json" });
-			// 	const href = URL.createObjectURL(blob);
-			// 	const link = document.createElement("a");
-			// 	link.href = href;
-			// 	link.download = "data.json";
-			// 	document.body.appendChild(link);
-			// 	link.click();
-			// 	document.body.removeChild(link);
+			collectCSV().then((data) => {
+				//Save as JSON file
+				const json = JSON.stringify(data);
+				const blob = new Blob([json], { type: "application/json" });
+				const href = URL.createObjectURL(blob);
+				const link = document.createElement("a");
+				link.href = href;
+				link.download = "data.json";
+				document.body.appendChild(link);
+				link.click();
+				document.body.removeChild(link);
 				
-			// });
+			});
 			console.log("fetching original data");
 			dataService
 				.getDataset("original", originalDataName + ".csv")
