@@ -18,10 +18,20 @@ def export_data_to_csv(filename, X, Y):
     for i in range(len(X)):
         X_Y.append([X[i], Y[i]])
     
-    np.savetxt(filename + ".csv", np.asarray(X_Y), delimiter=",", header="X,Y")
+    np.savetxt(filename + ".csv", np.asarray(X_Y), delimiter=",", header="x,y")
     
     
-def gen_clusters(numPoints=4000,n=2, add_outliers=False):    
+def gen_clusters(n_data=4000,n_clus=2, centers=None, point_share="equal", point_dist = "gaussian", add_outliers=False):
+    """Generates clusters of data points.
+
+    Args:
+        n_data (int, optional): Number of data points. Defaults to 4000.
+        n_clus (int, optional): Number of clusters. Defaults to 2.
+        centers (list(list(int)), optional): Cluster centers in a list of 2-d points. If not specified, centers will be generated randomly. Defaults to None.
+        point_share (list(float), optional): The proportion of all data points assignerd to each cluster. Options: "equal", "skewed".  Defaults to "equal".
+        point_dist (str, optional): The distribution of points w.r.t to the center of the cluster. Options: "uniform", "gaussian". Defaults to "gaussian".
+        add_outliers (bool, optional): Add outliers between cluster. Defaults to False.
+    """
     plt.subplot(325)
     plt.title(" blobs", fontsize="small")
     X1, Y1 = make_blobs(n_samples=[1500, 2500], n_features=2, cluster_std=
