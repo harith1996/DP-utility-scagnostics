@@ -241,7 +241,7 @@ function App() {
 							{
 								unbinned: unbinnedPrivData,
 								binned: binnedPrivData,
-								titleUnbinned: "Private Data (Unbinned)",
+								titleUnbinned: "Private Data (Unbinned + Denoised)",
 								titleBinned: `Private Data (Binned)`,
 								xDomain: [ogData?.xMin, ogData?.xMax],
 								yDomain: [ogData?.yMin, ogData?.yMax],
