@@ -22,7 +22,8 @@ export default class BinnedData2D {
 		yRange: number,
 		xMin: number,
 		yMin: number,
-		unbinThreshold: number = 4
+		unbinThreshold: number = 4,
+		unbinLimit: number = 20
 	) {
 		let n = this.numberOfBins;
 		let unbinnedData = [];
@@ -34,7 +35,7 @@ export default class BinnedData2D {
 				let x2 = ((i + 1) * xRange) / n;
 				let y2 = ((j + 1) * yRange) / n;
 				if (numberOfPoints > unbinThreshold) {
-					for (let k = 0; k < numberOfPoints; k++) {
+					for (let k = 0; k < Math.min(unbinLimit,numberOfPoints); k++) {
 						let x = xMin + Math.random() * (x2 - x1) + x1;
 						let y = yMin + Math.random() * (y2 - y1) + y1;
 						// let x = Math.random() * (x2 - x1) + x1;

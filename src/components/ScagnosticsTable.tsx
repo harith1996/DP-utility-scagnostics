@@ -18,20 +18,20 @@ const SCORES = [
 
 const columns: GridColDef[] = [
 	{ field: "scoreName", headerName: "Scagnostics Measure", width: 200 },
-	{ field: "score0", headerName: "Score (original)", width: 200 },
-	{ field: "score1", headerName: "Score (original denoised)", width: 200 },
-	{ field: "score2", headerName: "Score (private)", width: 200 },
-	{ field: "score3", headerName: "Score (private convex hull)", width: 200 },
+	{ field: "score0", headerName: "Score (original)", width: 120 },
+	{ field: "score1", headerName: "Score (original denoised)", width: 190 },
+	{ field: "score2", headerName: "Score (private)", width: 120 },
+	// { field: "score3", headerName: "Score (private convex hull)", width: 200 },
 	{
 		field: "diff12",
 		headerName: "Difference (private - original)",
 		width: 200,
 	},
-	{
-		field: "diff13",
-		headerName: "Difference (private convex hull - original)",
-		width: 200,
-	},
+	// {
+	// 	field: "diff13",
+	// 	headerName: "Difference (private convex hull - original)",
+	// 	width: 200,
+	// },
 	// {
 	// 	field: "age",
 	// 	headerName: "Age",

@@ -59,7 +59,7 @@
                 "y": {
                     "aggregate": "mean",
                     "field": "rmsd",
-                    "title": "Root Mean Squared Distance (avg)",
+                    "title": "Euclidean Distance (avg)",
                     "type": "quantitative",
                     "scale": {
                         "domain": [

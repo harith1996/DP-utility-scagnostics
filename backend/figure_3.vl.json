@@ -1,0 +1,41 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "vconcat": [
+        {
+            "data": {
+                "url": "2_clusters.csv"
+            },
+            "mark": "point",
+            "height": 400,
+            "width": 500,
+            "encoding": {
+                "x": {
+                    "field": "x",
+                    "type": "quantitative"
+                },
+                "y": {
+                    "field": "y",
+                    "type": "quantitative"
+                }
+            }
+        },
+        {
+            "data": {
+                "url": "2_clusters_corr.csv"
+            },
+            "mark": "point",
+            "height": 400,
+            "width": 500,
+            "encoding": {
+                "x": {
+                    "field": "x",
+                    "type": "quantitative"
+                },
+                "y": {
+                    "field": "y",
+                    "type": "quantitative"
+                }
+            }
+        }
+    ]
+}
