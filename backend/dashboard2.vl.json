@@ -11,7 +11,7 @@
     },
     {
       "name": "source_1",
-      "url": "./odin2_2023-09-21_140419_comma.csv",
+      "url": "https://luccas17.github.io/vegaliteBalticMap/data/odin2_2023-09-21_140419_comma.csv",
       "format": {"type": "csv", "delimiter": ","}
     },
     {
@@ -22,7 +22,7 @@
           "type": "aggregate",
           "groupby": ["Station name"],
           "ops": ["mean", "mean", "mean"],
-          "fields": ["Latitude", "Longitude", "Temperature_parsed"],
+          "fields": ["Latitude", "Longitude", "Temperature"],
           "as": ["mean_latitude", "mean_longitude", "mean_temp"]
         },
         {
@@ -39,9 +39,6 @@
         {
           "type": "filter",
           "expr": "isValid(datum[\"mean_temp\"]) && isFinite(+datum[\"mean_temp\"])"
-        },
-        {
-          "type": "formula", "as": "Temperature_parsed", "expr": "parseFloat(datum[\"Temperature\"])"
         }
       ]
     },
@@ -63,6 +60,9 @@
           "type": "timeunit",
           "units": ["year", "month"],
           "as": ["yearmonth_date", "yearmonth_date_end"]
+        },
+        {
+          "type": "formula", "as": "Temperature_parsed", "expr": "parseFloat(datum[\"Temperature\"])"
         }
       ]
     },
@@ -189,9 +189,9 @@
   "projections": [
     {
       "name": "projection",
-      "center": [17, 59], 
-      "scale": 3000,       
-      "clipExtent": [[0, 200], [800,900]] 
+      "center": [17, 59],  
+      "scale": 3000,    
+      "clipExtent": [[0, 200], [800,900]]
     }
   ],
   "signals": [
