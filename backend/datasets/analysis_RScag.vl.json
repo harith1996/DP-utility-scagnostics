@@ -26,6 +26,7 @@
                     "aggregate": "mean",
                     "field": "rmsd",
                     "type": "quantitative",
+                    "title": "Euclidean Distance (avg)- Robust Scagnostics",
                     "scale": {
                         "domain": [
                             0,
