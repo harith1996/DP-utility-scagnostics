@@ -1,5 +1,9 @@
 .App {
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 .App-logo {
   height: 40vmin;
@@ -102,6 +106,7 @@
   flex-direction: column;
   align-items: start;
   justify-content: start;
+  padding-left: 40px;
 }
 
 .scag-table-head{
@@ -116,8 +121,43 @@
 }
 #content > div {
   margin: 10px;
+  display:flex;
+}
+
+.filter-form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: x-large;
+}
+
+.filter-form > div {
   display: flex;
   flex-direction: column;
-  align-content: center;
+  align-items: center;
   justify-content: center;
+  margin: 20px;
+  font-size: large;
+}
+
+.filter-form select {
+  font-size: large;
+}
+.filter-form input {
+  font-size: large;
+}
+.scag-table {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 20px;
+}
+
+#unbin-threshold-slider
+{
+  width: 400px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
