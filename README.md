@@ -2,7 +2,7 @@
 A web application to create differentially private scatterplots and measure their utility through scagnostics. This project is part of the course "Advanced Data Management and Analysis" at Aarhus University. 
 
 ![Screenshot](system_screenshot.png)
-
+![Scagnostics](https://www.researchgate.net/publication/280586275/figure/fig3/AS:667786871332869@1536224205317/Nine-scagnostics-measures-from-Wilkinson-and-Wills-2008.png)
 ## Installation
 To install the project, you need to have Node.js installed. You can download it [here](https://nodejs.org/en/download/).
 
